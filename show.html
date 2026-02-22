@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>BTF TV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--g:#FFD700;--gd:#C9A800;--gl:#FFF3B0;--bk:#080808;--b2:#111;--b3:#1a1a1a;--b4:#222;--wh:#fff;--gr:#777;--gr2:#444;--rd:#E8000A;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Poppins',sans-serif;background:var(--bk);color:var(--wh);max-width:480px;margin:0 auto;min-height:100vh;-webkit-font-smoothing:antialiased;}
+/* TOP BAR */
+.tbar{display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;z-index:50;background:var(--bk);border-bottom:1px solid #1e1e1e;}
+.bk{background:var(--b3);border:none;color:var(--wh);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;flex-shrink:0;}
+.bk:active{background:var(--g);color:var(--bk);}
+.bar-t{font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:1px;color:var(--wh);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* SHOW HERO */
+.sh-hero{position:relative;width:100%;padding-top:62%;overflow:hidden;}
+.sh-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.sh-hero-fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5));}
+.sh-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,1) 0%,rgba(8,8,8,.05) 60%,transparent 100%);}
+.sh-info{position:absolute;bottom:16px;left:16px;right:16px;z-index:3;}
+.sh-title{font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--wh);letter-spacing:.5px;line-height:1;}
+.sh-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:7px;}
+.pill{font-size:.65rem;padding:3px 10px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:var(--wh);font-weight:600;}
+.pill-g{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.3);color:var(--g);}
+.rpill{font-size:.65rem;padding:3px 10px;border-radius:12px;background:var(--g);color:var(--bk);font-weight:700;}
+/* BODY */
+.sbody{padding:16px;}
+.sh-desc{font-size:.83rem;color:#aaa;line-height:1.6;margin-bottom:12px;}
+.sh-cast{font-size:.75rem;color:var(--gr);margin-bottom:18px;}
+.sh-cast b{color:var(--gl);}
+.sh-acts{display:flex;gap:10px;margin-bottom:22px;}
+.btn-wa{flex:1;background:var(--g);color:var(--bk);border:none;padding:13px;border-radius:10px;font-family:'Poppins',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;}
+.btn-wa:active{background:var(--gd);}
+.btn-sh{background:var(--b3);color:var(--wh);border:1px solid var(--b4);padding:13px 16px;border-radius:10px;font-family:'Poppins',sans-serif;font-size:.82rem;cursor:pointer;}
+.btn-sh:active{border-color:var(--g);color:var(--g);}
+/* EP HEADER */
+.ep-hdr{font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--wh);display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.ep-hdr::before{content:'';display:inline-block;width:3px;height:18px;background:var(--g);border-radius:2px;}
+.ep-cnt{font-size:.7rem;color:var(--gr);background:var(--b3);padding:2px 8px;border-radius:10px;font-family:'Poppins',sans-serif;font-weight:500;}
+/* EP CARD */
+.epc{display:flex;align-items:center;gap:12px;padding:12px;background:var(--b2);border-radius:12px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:all .15s;position:relative;}
+.epc:active{background:var(--b3);border-color:var(--gd);}
+.epc.locked{opacity:.7;}
+.epc.locked::after{content:'🔒';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.9rem;}
+.ep-num{font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--g);min-width:30px;text-align:center;line-height:1;}
+.ep-th{width:76px;height:76px;border-radius:8px;overflow:hidden;background:var(--b3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.8rem;position:relative;}
+.ep-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.ep-th-play{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:1.3rem;opacity:0;transition:opacity .15s;}
+.epc:hover .ep-th-play,.epc:active .ep-th-play{opacity:1;}
+.ep-inf{flex:1;min-width:0;}
+.ep-tit{font-size:.83rem;font-weight:600;color:var(--wh);line-height:1.3;}
+.ep-dsc{font-size:.7rem;color:var(--gr);margin-top:3px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ep-meta{display:flex;gap:8px;align-items:center;margin-top:5px;}
+.ep-dur{font-size:.64rem;color:var(--gr);}
+.ep-free{font-size:.58rem;padding:2px 7px;border-radius:4px;background:rgba(26,122,26,.3);color:#4caf50;font-weight:700;border:1px solid rgba(76,175,80,.2);}
+.ep-vid{font-size:.58rem;color:var(--gr2);}
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--b3);color:var(--wh);border:1px solid var(--b4);padding:10px 20px;border-radius:30px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.sp{height:30px;}
+/* Loading */
+#loading{position:fixed;inset:0;background:var(--bk);display:flex;align-items:center;justify-content:center;z-index:100;}
+.ld-inner{text-align:center;}
+.ld-logo{font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--g);letter-spacing:3px;}
+.ld-logo span{color:var(--rd);}
+.ld-bar{width:120px;height:3px;background:var(--b4);border-radius:3px;margin:12px auto 0;overflow:hidden;}
+.ld-fill{height:100%;background:var(--g);border-radius:3px;animation:ldAnim 1s ease-in-out forwards;}
+@keyframes ldAnim{from{width:0}to{width:100%}}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="ld-inner">
+    <div class="ld-logo" id="ld-logo">BTF<span>TV</span></div>
+    <div class="ld-bar"><div class="ld-fill"></div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- TOP BAR -->
+<div class="tbar">
+  <button class="bk" onclick="history.back()">←</button>
+  <div class="bar-t" id="bar-t">Loading...</div>
+</div>
+
+<!-- SHOW HERO -->
+<div class="sh-hero" id="sh-hero">
+  <img id="sh-img" class="sh-hero-img" src="" alt="" onerror="this.style.display='none'">
+  <div class="sh-hero-fb" id="sh-fb"></div>
+  <div class="sh-shade"></div>
+  <div class="sh-info">
+    <div class="sh-title" id="sh-title"></div>
+    <div class="sh-meta" id="sh-meta"></div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="sbody">
+  <p class="sh-desc" id="sh-desc"></p>
+  <p class="sh-cast" id="sh-cast"></p>
+  <div class="sh-acts">
+    <button class="btn-wa" id="btn-wa">▶ Episode 1 से शुरू</button>
+    <button class="btn-sh" onclick="shareShow()">↗ Share</button>
+  </div>
+  <div class="ep-hdr">Episodes <span class="ep-cnt" id="ep-cnt"></span></div>
+  <div id="ep-list"></div>
+</div>
+
+<div class="sp"></div>
+
+<script>
+let D=null,show=null;
+const params=new URLSearchParams(location.search);
+const sid=params.get('id');
+
+async function load(){
+  try{const r=await fetch('./data.json');if(!r.ok)throw 0;D=await r.json();}
+  catch{document.getElementById('loading').innerHTML='<p style="color:#fff;padding:20px">⚠️ data.json not found</p>';return;}
+  show=D.shows.find(s=>s.id===sid);
+  if(!show){document.getElementById('loading').innerHTML='<p style="color:#fff;padding:20px">Show not found</p>';return;}
+  setFavicon();
+  render();
+  setTimeout(()=>{document.getElementById('loading').style.opacity='0';setTimeout(()=>document.getElementById('loading').style.display='none',300);},600);
+}
+
+function setFavicon(){
+  if(!D.site.favicon_url)return;
+  let l=document.querySelector("link[rel='icon']")||document.createElement('link');
+  l.rel='icon';l.href=D.site.favicon_url;document.head.appendChild(l);
+}
+
+function render(){
+  const s=show;
+  document.title=s.title+' – '+D.site.name;
+  document.getElementById('bar-t').textContent=s.title;
+  // Hero
+  const img=document.getElementById('sh-img');
+  img.src=s.banner_url||s.poster_url||'';
+  img.onload=()=>{document.getElementById('sh-fb').style.display='none';};
+  document.getElementById('sh-fb').textContent=s.emoji;
+  document.getElementById('sh-title').textContent=s.title;
+  // Meta
+  const badges={new:'b-new',hot:'b-hot',premium:'b-premium',free:'b-free'};
+  document.getElementById('sh-meta').innerHTML=
+    `<span class="rpill">⭐ ${s.rating}</span>
+     <span class="pill">${s.genre}</span>
+     <span class="pill">${s.language}</span>
+     <span class="pill">${s.year}</span>
+     <span class="pill">${s.total_episodes} Episodes</span>
+     <span class="pill ${badges[s.badge_type]||'b-new'}" style="border:none">${s.badge}</span>`;
+  document.getElementById('sh-desc').textContent=s.description;
+  document.getElementById('sh-cast').innerHTML='<b>Cast:</b> '+s.cast;
+  document.getElementById('ep-cnt').textContent=s.episodes.length+' eps';
+  // Watch btn
+  const firstFree=s.episodes.findIndex(e=>e.is_free);
+  const startIdx=firstFree>=0?firstFree:0;
+  document.getElementById('btn-wa').onclick=()=>goPlay(startIdx);
+  // Episodes
+  document.getElementById('ep-list').innerHTML=s.episodes.map((ep,i)=>
+    `<div class="epc ${ep.is_free?'':'locked'}" onclick="epCk(${i})">
+      <div class="ep-num">${ep.ep}</div>
+      <div class="ep-th" style="background:${s.gradient}">
+        <img src="${ep.thumbnail_url||''}" alt="" onerror="this.style.display='none'">
+        <div class="ep-th-play">▶</div>
+      </div>
+      <div class="ep-inf">
+        <div class="ep-tit">${ep.title}</div>
+        <div class="ep-dsc">${ep.description}</div>
+        <div class="ep-meta">
+          <span class="ep-dur">⏱ ${ep.duration}</span>
+          ${ep.is_free?'<span class="ep-free">FREE</span>':''}
+          <span class="ep-vid">${ep.video_id}</span>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function epCk(i){
+  const ep=show.episodes[i];
+  if(!ep.is_free){toast('🔒 GOLD subscribers ke liye');return;}
+  goPlay(i);
+}
+function goPlay(i){
+  location.href='player.html?sid='+sid+'&ei='+i;
+}
+function shareShow(){
+  if(navigator.share){navigator.share({title:show.title,text:show.description,url:location.href});}
+  else{navigator.clipboard?.writeText(location.href);toast('Link copy ho gaya! 🔗');}
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+load();
+</script>
+</body>
+</html>
