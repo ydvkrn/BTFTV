@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>BTF TV – Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- SECURITY: Prevent any right-click, selection, drag -->
+<style>
+*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+</style>
+</head>
+<body>
+
+<style>
+:root{--g:#FFD700;--gd:#C9A800;--bk:#000;--b2:#0d0d0d;--b3:#1a1a1a;--b4:#222;--wh:#fff;--gr:#777;--rd:#E8000A;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Poppins',sans-serif;background:var(--bk);color:var(--wh);max-width:480px;margin:0 auto;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+/* LOADING SCREEN */
+#ld{position:fixed;inset:0;background:var(--bk);z-index:200;display:flex;align-items:center;justify-content:center;transition:opacity .4s;}
+#ld.off{opacity:0;pointer-events:none;}
+.ld-logo{font-family:'Bebas Neue',cursive;font-size:2.8rem;color:var(--g);letter-spacing:3px;text-align:center;}
+.ld-logo span{color:var(--rd);}
+.ld-bar{width:100px;height:2px;background:var(--b4);border-radius:2px;margin:10px auto 0;overflow:hidden;}
+.ld-f{height:100%;background:var(--g);animation:lf 1.2s ease forwards;}
+@keyframes lf{from{width:0}to{width:100%}}
+
+/* TOP BAR */
+.tbar{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--bk);border-bottom:1px solid #1a1a1a;}
+.bk{background:var(--b3);border:none;color:var(--wh);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;flex-shrink:0;}
+.bk:active{background:var(--g);color:var(--bk);}
+.bar-t{font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--wh);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-id{margin-left:auto;font-size:.65rem;color:var(--b4);font-family:'Poppins',sans-serif;}
+
+/* ═══ VIDEO WRAPPER ═══ */
+#vid-wrap{
+  position:relative;
+  width:100%;
+  padding-top:56.25%;
+  background:#000;
+  overflow:hidden;
+  /* Block screenshot/screen-record hints (CSS only) */
+  -webkit-touch-callout:none;
+}
+
+/* INVISIBLE OVERLAY — blocks right-click & long-press on video */
+#vid-block{
+  position:absolute;inset:0;z-index:10;
+  background:transparent;
+  pointer-events:none; /* Will be set to 'all' after JS loads */
+}
+
+/* The actual video — completely hidden native controls */
+#vid{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:contain;
+  background:#000;
+  display:block;
+  /* Remove ALL native controls */
+  pointer-events:none;
+}
+/* Hide ALL native browser media controls */
+video::-webkit-media-controls{display:none!important;}
+video::-webkit-media-controls-enclosure{display:none!important;}
+video::-webkit-media-controls-panel{display:none!important;}
+video::--webkit-media-controls{display:none!important;}
+video::-moz-range-thumb{display:none!important;}
+
+/* BUFFER BAR */
+#buf{
+  position:absolute;bottom:52px;left:0;right:0;height:2px;
+  background:rgba(255,255,255,.1);z-index:12;
+}
+#buf-fill{height:100%;background:rgba(255,255,255,.2);width:0;transition:width .3s;}
+
+/* CUSTOM PROGRESS */
+#prog-wrap{
+  position:absolute;bottom:42px;left:0;right:0;z-index:12;
+  padding:6px 0;cursor:pointer;
+}
+#prog-track{
+  width:100%;height:3px;background:rgba(255,255,255,.15);
+  position:relative;transition:height .2s;
+}
+#prog-wrap:hover #prog-track{height:5px;}
+#prog-fill{height:100%;background:var(--g);width:0%;border-radius:2px;pointer-events:none;transition:width .05s linear;}
+#prog-thumb{
+  width:14px;height:14px;background:var(--g);border-radius:50%;
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  left:0%;display:none;box-shadow:0 0 6px rgba(255,215,0,.5);
+}
+#prog-wrap:hover #prog-thumb{display:block;}
+#prog-time{
+  position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.85);color:var(--wh);font-size:.65rem;
+  padding:2px 8px;border-radius:4px;white-space:nowrap;
+  opacity:0;transition:opacity .2s;pointer-events:none;margin-bottom:6px;
+}
+#prog-wrap:hover #prog-time{opacity:1;}
+
+/* MAIN CONTROLS */
+#ctrl{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(to top,rgba(0,0,0,.9) 0%,transparent 100%);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px 10px;z-index:15;
+  height:44px;
+}
+
+/* SKIP BUTTONS */
+.skip-btn{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:14;
+  background:rgba(0,0,0,.35);
+  border:none;color:var(--wh);
+  width:52px;height:52px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;gap:1px;
+  opacity:0;transition:opacity .2s;
+  -webkit-backdrop-filter:blur(4px);
+}
+.skip-btn span{font-size:.5rem;font-weight:700;color:rgba(255,255,255,.8);}
+#skip-b{left:calc(50% - 90px);}
+#skip-f{right:calc(50% - 90px);}
+#vid-wrap.ctrl-vis .skip-btn{opacity:1;}
+.skip-ico{font-size:1.4rem;}
+
+/* PLAY/PAUSE CENTER BTN */
+#play-btn{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:14;
+  width:58px;height:58px;background:rgba(255,215,0,.9);border-radius:50%;
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;box-shadow:0 0 20px rgba(255,215,0,.35);
+  opacity:0;transition:opacity .2s;
+  backdrop-filter:blur(4px);
+}
+#vid-wrap.ctrl-vis #play-btn{opacity:1;}
+
+/* TIME DISPLAY */
+.ctrl-time{font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600;letter-spacing:.3px;}
+
+/* EPISODE NAV ARROWS */
+.ep-arrow{
+  background:none;border:none;color:rgba(255,255,255,.6);
+  font-size:1.4rem;cursor:pointer;padding:4px 8px;transition:color .2s;
+}
+.ep-arrow:active{color:var(--g);}
+.ep-arrow:disabled{opacity:.2;cursor:not-allowed;}
+
+/* SPINNER WHILE LOADING */
+#spinner{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:13;
+  display:none;
+}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+#spinner.on{display:block;animation:spin .8s linear infinite;}
+.spin-ring{
+  width:44px;height:44px;border:3px solid rgba(255,255,255,.1);
+  border-top-color:var(--g);border-radius:50%;
+}
+
+/* DOUBLE TAP FLASH */
+.dt-flash{
+  position:absolute;top:0;bottom:0;width:45%;
+  background:rgba(255,215,0,.12);border-radius:4px;
+  opacity:0;z-index:16;pointer-events:none;transition:opacity .15s;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--g);letter-spacing:.5px;
+}
+#dt-left{left:0;border-radius:0 50% 50% 0;}
+#dt-right{right:0;border-radius:50% 0 0 50%;}
+.dt-flash.on{opacity:1;}
+
+/* INFO SECTION */
+.info-sec{padding:14px 16px 8px;}
+.sh-name{font-size:.75rem;color:var(--g);font-weight:600;margin-bottom:4px;}
+.ep-title{font-family:'Bebas Neue',cursive;font-size:1.7rem;color:var(--wh);letter-spacing:.5px;line-height:1.1;}
+.ep-meta{font-size:.72rem;color:var(--gr);margin-top:5px;}
+.ep-desc{font-size:.8rem;color:#999;line-height:1.55;margin-top:10px;}
+
+/* EPISODE LIST NEXT */
+.nxt-sec{padding:4px 16px 16px;}
+.nxt-title{font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:.8px;color:var(--wh);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.nxt-title::before{content:'';display:inline-block;width:3px;height:16px;background:var(--rd);border-radius:2px;}
+.nepc{display:flex;align-items:center;gap:12px;padding:11px 12px;background:var(--b2);border-radius:12px;margin-bottom:7px;cursor:pointer;border:1px solid transparent;transition:border-color .15s;}
+.nepc:active{background:var(--b3);border-color:var(--gd);}
+.nepc.locked{opacity:.65;}
+.ne-num{font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--g);min-width:26px;text-align:center;line-height:1;}
+.ne-th{width:65px;height:65px;border-radius:8px;overflow:hidden;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.ne-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.ne-inf{flex:1;min-width:0;}
+.ne-tit{font-size:.8rem;font-weight:600;color:var(--wh);}
+.ne-meta{font-size:.66rem;color:var(--gr);margin-top:3px;}
+.ne-lock{margin-left:auto;font-size:.9rem;}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--b3);color:var(--wh);border:1px solid var(--b4);padding:10px 20px;border-radius:30px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.sp{height:30px;}
+</style>
+
+<!-- LOADING -->
+<div id="ld"><div><div class="ld-logo" id="ld-logo">BTF<span>TV</span></div><div class="ld-bar"><div class="ld-f"></div></div></div></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- TOP BAR -->
+<div class="tbar">
+  <button class="bk" id="back-btn">←</button>
+  <div class="bar-t" id="bar-t">Loading...</div>
+  <div class="bar-id" id="bar-id"></div>
+</div>
+
+<!-- VIDEO WRAP -->
+<div id="vid-wrap">
+  <!-- Security overlay: blocks all right-click, save, etc. -->
+  <div id="vid-block"></div>
+
+  <!-- Double tap flash indicators -->
+  <div class="dt-flash" id="dt-left">◀◀ 10s</div>
+  <div class="dt-flash" id="dt-right">10s ▶▶</div>
+
+  <!-- Spinner -->
+  <div id="spinner"><div class="spin-ring"></div></div>
+
+  <!-- Actual Video element — NO SRC set here, set via JS -->
+  <video id="vid"
+    playsinline
+    preload="metadata"
+    disablepictureinpicture
+    controlslist="nodownload nofullscreen noremoteplayback"
+    x-webkit-airplay="deny"
+  ></video>
+
+  <!-- Buffer bar -->
+  <div id="buf"><div id="buf-fill"></div></div>
+
+  <!-- Progress -->
+  <div id="prog-wrap" id="prog">
+    <div id="prog-track">
+      <div id="prog-fill"></div>
+      <div id="prog-thumb"></div>
+    </div>
+    <div id="prog-time">0:00</div>
+  </div>
+
+  <!-- Skip buttons -->
+  <button class="skip-btn" id="skip-b" onclick="skip(-10)">
+    <span class="skip-ico">↺</span><span>10s</span>
+  </button>
+  <button class="skip-btn" id="skip-f" onclick="skip(10)">
+    <span class="skip-ico">↻</span><span>10s</span>
+  </button>
+
+  <!-- Play / Pause center -->
+  <button id="play-btn" onclick="togglePlay()">▶</button>
+
+  <!-- Controls bar -->
+  <div id="ctrl">
+    <span class="ctrl-time" id="t-cur">0:00</span>
+    <button class="ep-arrow" id="ep-prev" onclick="prevEp()">⏮</button>
+    <button class="ep-arrow" id="ep-next" onclick="nextEp()">⏭</button>
+    <span class="ctrl-time" id="t-dur">--:--</span>
+  </div>
+</div>
+
+<!-- INFO -->
+<div class="info-sec">
+  <div class="sh-name" id="sh-name"></div>
+  <div class="ep-title" id="ep-title"></div>
+  <div class="ep-meta" id="ep-meta"></div>
+  <div class="ep-desc" id="ep-desc"></div>
+</div>
+
+<!-- NEXT EPISODES -->
+<div class="nxt-sec">
+  <div class="nxt-title">अगले Episodes</div>
+  <div id="nxt-list"></div>
+</div>
+
+<div class="sp"></div>
+
+<!-- ═══════ JAVASCRIPT ═══════ -->
+<script>
+'use strict';
+
+// ── SECURITY LAYER ──────────────────────────────────────
+// Block right-click everywhere
+document.addEventListener('contextmenu',e=>e.preventDefault(),true);
+// Block keyboard shortcuts that reveal source
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['s','u','a','c','j','i','p'].includes(k)){e.preventDefault();e.stopPropagation();}
+  if(e.key==='F12'||e.key==='PrintScreen'){e.preventDefault();}
+},true);
+// Block drag-drop
+document.addEventListener('dragstart',e=>e.preventDefault(),true);
+document.addEventListener('drop',e=>e.preventDefault(),true);
+// Block text selection
+document.addEventListener('selectstart',e=>e.preventDefault(),true);
+// Block touch long-press context menu
+document.addEventListener('touchstart',e=>{if(e.target.tagName==='VIDEO')e.preventDefault();},{passive:false});
+
+// ── STATE ────────────────────────────────────────────────
+let D=null, show=null, epIdx=0, ctrlTimer=null, isDragging=false, blobUrl=null;
+const params=new URLSearchParams(location.search);
+const sid=params.get('sid');
+epIdx=parseInt(params.get('ei')||'0',10);
+const history_=JSON.parse(localStorage.getItem('btftv_h')||'{}');
+
+// ── ELEMENTS ─────────────────────────────────────────────
+const vid=document.getElementById('vid');
+const vidWrap=document.getElementById('vid-wrap');
+const playBtn=document.getElementById('play-btn');
+const progFill=document.getElementById('prog-fill');
+const progThumb=document.getElementById('prog-thumb');
+const progTime=document.getElementById('prog-time');
+const bufFill=document.getElementById('buf-fill');
+const tCur=document.getElementById('t-cur');
+const tDur=document.getElementById('t-dur');
+const spinner=document.getElementById('spinner');
+const dtLeft=document.getElementById('dt-left');
+const dtRight=document.getElementById('dt-right');
+
+// ── LOAD DATA ─────────────────────────────────────────────
+async function load(){
+  try{const r=await fetch('./data.json');if(!r.ok)throw 0;D=await r.json();}
+  catch{showError('data.json load failed');return;}
+  show=D.shows.find(s=>s.id===sid);
+  if(!show){showError('Show not found');return;}
+  setFavicon();
+  setupSecurity();
+  loadEpisode(epIdx);
+  // After short delay, hide loader
+  setTimeout(()=>{document.getElementById('ld').classList.add('off');},800);
+}
+
+function setFavicon(){
+  if(!D.site.favicon_url)return;
+  let l=document.querySelector("link[rel='icon']")||document.createElement('link');
+  l.rel='icon';l.href=D.site.favicon_url;document.head.appendChild(l);
+}
+
+// ── LOAD EPISODE ──────────────────────────────────────────
+function loadEpisode(idx){
+  const ep=show.episodes[idx];
+  if(!ep)return;
+  epIdx=idx;
+
+  // Update URL without reload
+  const newUrl=location.pathname+'?sid='+sid+'&ei='+idx;
+  history.replaceState(null,'',newUrl);
+
+  // Revoke previous blob URL
+  if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}
+
+  // Update UI info
+  document.getElementById('bar-t').textContent='Ep '+ep.ep+' · '+ep.title;
+  document.getElementById('bar-id').textContent=''; // DO NOT show video ID in visible UI
+  document.getElementById('sh-name').textContent=show.title+' · '+show.genre;
+  document.getElementById('ep-title').textContent=ep.title;
+  document.getElementById('ep-meta').textContent=
+    'Episode '+ep.ep+'  ·  '+ep.duration+'  ·  '+show.language+' · '+show.year;
+  document.getElementById('ep-desc').textContent=ep.description;
+  document.title='Ep '+ep.ep+' – '+show.title+' | '+D.site.name;
+
+  // Nav buttons
+  document.getElementById('ep-prev').disabled=idx===0;
+  document.getElementById('ep-next').disabled=idx===show.episodes.length-1;
+
+  // Load video via blob URL (masks actual URL from network tab display)
+  loadVideoSecure(ep.video_url);
+
+  // Render next episodes
+  renderNext(idx);
+
+  // Restore watch position if exists
+  const key=sid+'_'+idx;
+  const savedTime=history_[key]?.t||0;
+  if(savedTime>3){
+    vid.addEventListener('canplay',function once(){
+      vid.currentTime=savedTime;
+      vid.removeEventListener('canplay',once);
+    });
+  }
+}
+
+// ── SECURE VIDEO LOAD ─────────────────────────────────────
+// Fetches video and plays via blob URL so actual URL is NOT in src attribute
+async function loadVideoSecure(url){
+  spinner.classList.add('on');
+  vid.src='';
+  try{
+    const resp=await fetch(url,{mode:'cors'});
+    if(!resp.ok)throw new Error('fetch failed');
+    const blob=await resp.blob();
+    blobUrl=URL.createObjectURL(blob);
+    vid.src=blobUrl;
+    vid.load();
+  } catch(e){
+    // Fallback: if CORS blocks blob approach, use direct src
+    // URL still won't be obvious in DOM
+    vid.src=url;
+    vid.load();
+  }
+  spinner.classList.remove('on');
+}
+
+// ── PLAYBACK CONTROLS ─────────────────────────────────────
+function togglePlay(){
+  if(vid.paused){vid.play().catch(()=>{});playBtn.textContent='⏸';}
+  else{vid.pause();playBtn.textContent='▶';}
+  showCtrl();
+}
+
+function skip(sec){
+  vid.currentTime=Math.max(0,Math.min(vid.duration||0,vid.currentTime+sec));
+  flashSkip(sec<0?'left':'right');
+  showCtrl();
+}
+
+function prevEp(){
+  if(epIdx>0)loadEpisode(epIdx-1);
+}
+function nextEp(){
+  if(epIdx<show.episodes.length-1){
+    const next=show.episodes[epIdx+1];
+    if(!next.is_free){toast('🔒 GOLD subscribers ke liye');return;}
+    loadEpisode(epIdx+1);
+  }
+}
+
+// ── CONTROLS VISIBILITY ───────────────────────────────────
+function showCtrl(){
+  vidWrap.classList.add('ctrl-vis');
+  clearTimeout(ctrlTimer);
+  if(!vid.paused){ctrlTimer=setTimeout(()=>vidWrap.classList.remove('ctrl-vis'),3000);}
+}
+
+vidWrap.addEventListener('click',()=>{
+  if(vidWrap.classList.contains('ctrl-vis')){
+    if(!vid.paused){vidWrap.classList.remove('ctrl-vis');}
+  } else {
+    showCtrl();
+  }
+});
+
+// ── VIDEO EVENTS ──────────────────────────────────────────
+vid.addEventListener('play',()=>{playBtn.textContent='⏸';showCtrl();});
+vid.addEventListener('pause',()=>{playBtn.textContent='▶';showCtrl();});
+vid.addEventListener('waiting',()=>spinner.classList.add('on'));
+vid.addEventListener('canplay',()=>spinner.classList.remove('on'));
+vid.addEventListener('loadedmetadata',()=>{
+  tDur.textContent=fmt(vid.duration);
+});
+vid.addEventListener('timeupdate',()=>{
+  if(!isDragging&&!isNaN(vid.duration)){
+    const pct=(vid.currentTime/vid.duration)*100;
+    progFill.style.width=pct+'%';
+    progThumb.style.left=pct+'%';
+    tCur.textContent=fmt(vid.currentTime);
+    saveProgress();
+  }
+  // Buffer
+  if(vid.buffered.length>0){
+    const bpct=(vid.buffered.end(vid.buffered.length-1)/vid.duration)*100;
+    bufFill.style.width=bpct+'%';
+  }
+});
+vid.addEventListener('ended',()=>{
+  playBtn.textContent='▶';
+  vidWrap.classList.add('ctrl-vis');
+  if(epIdx<show.episodes.length-1){
+    const next=show.episodes[epIdx+1];
+    if(next?.is_free)setTimeout(()=>loadEpisode(epIdx+1),2000);
+  }
+});
+
+// ── PROGRESS BAR DRAG ─────────────────────────────────────
+const progWrap=document.getElementById('prog-wrap');
+function setProg(clientX){
+  const rect=progWrap.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+  const newTime=pct*vid.duration;
+  progFill.style.width=(pct*100)+'%';
+  progThumb.style.left=(pct*100)+'%';
+  tCur.textContent=fmt(newTime);
+  progTime.textContent=fmt(newTime);
+  return newTime;
+}
+progWrap.addEventListener('mousedown',e=>{
+  isDragging=true;
+  setProg(e.clientX);
+  e.preventDefault();
+});
+document.addEventListener('mousemove',e=>{if(isDragging){setProg(e.clientX);}});
+document.addEventListener('mouseup',e=>{
+  if(isDragging){vid.currentTime=setProg(e.clientX);isDragging=false;}
+});
+progWrap.addEventListener('touchstart',e=>{
+  isDragging=true;setProg(e.touches[0].clientX);e.preventDefault();
+},{passive:false});
+document.addEventListener('touchmove',e=>{if(isDragging)setProg(e.touches[0].clientX);},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(isDragging){vid.currentTime=setProg(e.changedTouches[0].clientX);isDragging=false;}
+});
+progWrap.addEventListener('mousemove',e=>{
+  const rect=progWrap.getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  progTime.textContent=fmt(pct*vid.duration);
+  progTime.style.left=(pct*100)+'%';
+});
+
+// ── DOUBLE TAP TO SKIP ────────────────────────────────────
+let tapTimer=null, lastTap=0;
+vidWrap.addEventListener('touchend',e=>{
+  if(e.target.closest('button')||e.target===document.getElementById('prog-wrap'))return;
+  const now=Date.now();
+  const rect=vidWrap.getBoundingClientRect();
+  const tx=e.changedTouches[0].clientX;
+  const isLeft=tx<rect.left+rect.width/2;
+  if(now-lastTap<300){
+    // Double tap
+    clearTimeout(tapTimer);
+    skip(isLeft?-10:10);
+  } else {
+    tapTimer=setTimeout(()=>{
+      showCtrl();
+    },300);
+  }
+  lastTap=now;
+});
+
+function flashSkip(side){
+  const el=side==='left'?dtLeft:dtRight;
+  el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'),500);
+}
+
+// ── SAVE PROGRESS ─────────────────────────────────────────
+function saveProgress(){
+  const key=sid+'_'+epIdx;
+  history_[key]={sid,ei:epIdx,t:Math.round(vid.currentTime),d:Math.round(vid.duration)||9999};
+  try{localStorage.setItem('btftv_h',JSON.stringify(history_));}catch(e){}
+}
+
+// ── RENDER NEXT EPISODES ──────────────────────────────────
+function renderNext(curIdx){
+  const list=document.getElementById('nxt-list');
+  const nexts=show.episodes.filter((_,i)=>i!==curIdx).slice(curIdx,curIdx+5);
+  if(!nexts.length){list.innerHTML='<p style="color:var(--gr);font-size:.8rem">कोई अगला episode नहीं।</p>';return;}
+  list.innerHTML=nexts.map((ep,i)=>{
+    const ni=curIdx+1+i;
+    return`<div class="nepc ${ep.is_free?'':'locked'}" onclick="nxtEpCk(${ni})">
+      <div class="ne-num">${ep.ep}</div>
+      <div class="ne-th" style="background:${show.gradient}">
+        <img src="${ep.thumbnail_url||''}" alt="" onerror="this.style.display='none'">
+        ${show.emoji}
+      </div>
+      <div class="ne-inf">
+        <div class="ne-tit">${ep.title}</div>
+        <div class="ne-meta">⏱ ${ep.duration}${ep.is_free?' · FREE':' · 🔒 GOLD'}</div>
+      </div>
+      ${ep.is_free?'':'<span class="ne-lock">🔒</span>'}
+    </div>`;
+  }).join('');
+}
+
+function nxtEpCk(i){
+  const ep=show.episodes[i];
+  if(!ep)return;
+  if(!ep.is_free){toast('🔒 Yeh episode GOLD subscribers ke liye hai');return;}
+  loadEpisode(i);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── SECURITY: Block overlay pointer events ─────────────────
+function setupSecurity(){
+  const block=document.getElementById('vid-block');
+  block.style.pointerEvents='all';
+  block.addEventListener('contextmenu',e=>e.preventDefault(),true);
+  block.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+  // DO NOT intercept click — we handle play/pause separately
+  block.style.cursor='default';
+}
+
+// Back button
+document.getElementById('back-btn').onclick=()=>{
+  vid.pause();
+  if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}
+  history.back();
+};
+
+// ── UTILS ─────────────────────────────────────────────────
+function fmt(s){
+  if(!s||isNaN(s))return'0:00';
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+function showError(msg){
+  document.getElementById('ld').innerHTML='<p style="color:#fff;padding:20px;font-family:sans-serif">⚠️ '+msg+'</p>';
+}
+
+// Prevent PiP
+document.addEventListener('enterpictureinpicture',e=>e.preventDefault(),true);
+
+// ── START ──────────────────────────────────────────────────
+load();
+</script>
+</body>
+</html>
