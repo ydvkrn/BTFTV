@@ -7,1329 +7,471 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold:#FFD700; --gold-d:#C9A800; --gold-l:#FFF3B0;
-  --black:#080808; --b2:#111; --b3:#1a1a1a; --b4:#222;
-  --white:#FFFFFF; --gray:#777; --gray2:#444;
-  --red:#E8000A; --red-d:#A00006;
-}
+:root{--g:#FFD700;--gd:#C9A800;--gl:#FFF3B0;--bk:#080808;--b2:#111;--b3:#1a1a1a;--b4:#222;--wh:#fff;--gr:#777;--gr2:#444;--rd:#E8000A;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
-body{
-  font-family:'Poppins',sans-serif;
-  background:var(--black);color:var(--white);
-  max-width:480px;margin:0 auto;
-  position:relative;overflow:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-
-/* ─── VIEWS ─── */
-.view{
-  position:absolute;inset:0;
-  overflow-y:auto;overflow-x:hidden;
-  background:var(--black);
-  transform:translateX(100%);
-  transition:transform .35s cubic-bezier(.4,0,.2,1);
-  will-change:transform;
-  padding-bottom:80px;
-}
-.view.active{transform:translateX(0);}
-.view.slide-left{transform:translateX(-30%);}
-#view-home{transform:translateX(0);}
-
-/* Scrollbar */
-.view::-webkit-scrollbar{width:0;}
-
-/* ─── POPUP ─── */
-#popup-overlay{
-  position:fixed;inset:0;z-index:999;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(6px);
-  display:flex;align-items:center;justify-content:center;
-  padding:20px;
-  transition:opacity .3s;
-}
-#popup-overlay.hidden{opacity:0;pointer-events:none;}
-.popup-card{
-  background:var(--b2);border-radius:20px;
-  overflow:hidden;width:100%;max-width:380px;
-  border:1.5px solid var(--gold-d);
-  box-shadow:0 0 40px rgba(255,215,0,.2);
-  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes popIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
-.popup-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
-.popup-img-placeholder{
-  width:100%;aspect-ratio:16/9;
-  background:linear-gradient(135deg,var(--b3),var(--b4));
-  display:flex;align-items:center;justify-content:center;
-  font-size:3rem;
-}
-.popup-body{padding:18px 20px 20px;}
-.popup-title{font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--gold);letter-spacing:1px;}
-.popup-sub{font-size:.78rem;color:var(--gray);margin-top:4px;line-height:1.4;}
-.popup-actions{display:flex;gap:10px;margin-top:16px;}
-.popup-btn-main{
-  flex:1;background:var(--gold);color:var(--black);
-  border:none;padding:11px;border-radius:10px;
-  font-family:'Poppins',sans-serif;font-weight:700;font-size:.85rem;
-  cursor:pointer;transition:background .2s;
-}
-.popup-btn-main:hover{background:var(--gold-d);}
-.popup-btn-dismiss{
-  background:var(--b4);color:var(--gray);
-  border:1px solid var(--gray2);padding:11px 14px;border-radius:10px;
-  font-family:'Poppins',sans-serif;font-size:.8rem;
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-}
-.popup-btn-dismiss:hover{color:var(--white);border-color:var(--white);}
-
-/* ─── HEADER ─── */
-.top-header{
-  background:var(--black);padding:14px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;
-  border-bottom:2px solid var(--gold-d);
-}
-.logo{
-  font-family:'Bebas Neue',cursive;font-size:2rem;
-  letter-spacing:3px;color:var(--gold);
-  text-shadow:0 0 18px rgba(255,215,0,.4);cursor:pointer;
-}
-.logo span{color:var(--red);}
-.header-icons{display:flex;gap:14px;align-items:center;}
-.icon-btn{
-  background:none;border:none;cursor:pointer;
-  color:var(--white);font-size:1.25rem;
-  transition:transform .2s;padding:2px;
-}
-.icon-btn:active{transform:scale(.85);}
-
-/* ─── SEARCH ─── */
-.search-wrap{margin:12px 16px;position:relative;}
-.search-bar{
-  display:flex;align-items:center;background:var(--b3);
-  border:1px solid var(--b4);border-radius:30px;
-  padding:9px 16px;gap:10px;
-  transition:border-color .2s;
-}
-.search-bar:focus-within{border-color:var(--gold-d);}
-.search-bar input{
-  flex:1;background:none;border:none;outline:none;
-  color:var(--white);font-family:'Poppins',sans-serif;font-size:.88rem;
-}
-.search-bar input::placeholder{color:var(--gray);}
-
-/* ─── TABS ─── */
-.tabs{
-  display:flex;overflow-x:auto;gap:8px;
-  padding:10px 16px;scrollbar-width:none;
-}
+body{font-family:'Poppins',sans-serif;background:var(--bk);color:var(--wh);max-width:480px;margin:0 auto;overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased;}
+/* POPUP */
+#pop{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .3s;}
+#pop.off{opacity:0;pointer-events:none;}
+.pop-card{background:var(--b2);border-radius:20px;overflow:hidden;width:100%;max-width:380px;border:1.5px solid var(--gd);box-shadow:0 0 50px rgba(255,215,0,.18);animation:popIn .45s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+.pop-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
+.pop-body{padding:18px 20px 22px;}
+.pop-title{font-family:'Bebas Neue',cursive;font-size:1.65rem;color:var(--g);letter-spacing:1px;}
+.pop-sub{font-size:.78rem;color:var(--gr);margin-top:4px;line-height:1.5;}
+.pop-acts{display:flex;gap:10px;margin-top:16px;}
+.pop-cta{flex:1;background:var(--g);color:var(--bk);border:none;padding:12px;border-radius:10px;font-family:'Poppins',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;}
+.pop-dis{background:var(--b4);color:var(--gr);border:1px solid var(--gr2);padding:12px 14px;border-radius:10px;font-family:'Poppins',sans-serif;font-size:.8rem;cursor:pointer;white-space:nowrap;}
+/* HEADER */
+header{background:var(--bk);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;border-bottom:2px solid var(--gd);}
+.logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:var(--g);text-shadow:0 0 18px rgba(255,215,0,.4);cursor:pointer;}
+.logo span{color:var(--rd);}
+.hicons{display:flex;gap:14px;align-items:center;}
+.hbtn{background:none;border:none;cursor:pointer;color:var(--wh);font-size:1.25rem;padding:2px;}
+/* SEARCH BAR */
+.srch{margin:12px 16px;display:flex;align-items:center;background:var(--b3);border:1px solid var(--b4);border-radius:30px;padding:9px 16px;gap:10px;cursor:pointer;}
+.srch span{color:var(--gr);font-size:.9rem;}
+.srch p{color:var(--gr);font-size:.88rem;pointer-events:none;}
+/* TABS */
+.tabs{display:flex;overflow-x:auto;gap:8px;padding:10px 16px;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{
-  flex-shrink:0;padding:6px 16px;border-radius:20px;
-  font-size:.78rem;font-weight:600;cursor:pointer;
-  border:1.5px solid var(--gray2);background:none;
-  color:var(--gray);transition:all .2s;
-  font-family:'Poppins',sans-serif;
-}
-.tab.active,.tab:active{background:var(--gold);color:var(--black);border-color:var(--gold);}
-
-/* ─── HERO BANNER ─── */
-.hero-banner{
-  position:relative;width:100%;
-  padding-top:56.25%;overflow:hidden;
-  cursor:pointer;
-}
-.hero-inner{
-  position:absolute;inset:0;
-  display:flex;align-items:flex-end;padding:20px;
-}
-.hero-bg-base{position:absolute;inset:0;}
-.hero-glow{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse at 25% 35%,rgba(255,215,0,.12) 0%,transparent 55%),
-    radial-gradient(ellipse at 80% 70%,rgba(232,0,10,.1) 0%,transparent 50%);
-}
-.hero-shade{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(8,8,8,.9) 0%,rgba(8,8,8,.2) 60%,transparent 100%);
-}
-.hero-content{position:relative;z-index:3;width:100%;}
-.hero-tag{
-  display:inline-block;background:var(--red);color:var(--white);
-  font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:4px;
-  letter-spacing:.8px;margin-bottom:7px;text-transform:uppercase;
-}
-.hero-title{
-  font-family:'Bebas Neue',cursive;font-size:2.3rem;
-  line-height:1;color:var(--white);letter-spacing:1px;
-}
-.hero-title span{color:var(--gold);}
-.hero-meta{font-size:.72rem;color:var(--gray);margin:5px 0 13px;}
-.hero-meta b{color:var(--gold-l);}
-.hero-actions{display:flex;gap:10px;}
-.btn-play{
-  background:var(--gold);color:var(--black);
-  border:none;padding:10px 20px;border-radius:8px;
-  font-family:'Poppins',sans-serif;font-weight:800;font-size:.82rem;
-  cursor:pointer;display:flex;align-items:center;gap:6px;
-  transition:all .2s;
-}
-.btn-play:active{background:var(--gold-d);transform:scale(.97);}
-.btn-outline{
-  background:rgba(255,255,255,.08);color:var(--white);
-  border:1.5px solid rgba(255,255,255,.25);
-  padding:10px 16px;border-radius:8px;
-  font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:600;
-  cursor:pointer;display:flex;align-items:center;gap:6px;
-  transition:all .2s;
-}
-.btn-outline:active{border-color:var(--gold);color:var(--gold);}
-
-/* ─── SECTION HEADER ─── */
-.sec-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 16px 10px;
-}
-.sec-title{
-  font-family:'Bebas Neue',cursive;font-size:1.35rem;
-  letter-spacing:1px;color:var(--white);
-  display:flex;align-items:center;gap:8px;
-}
-.sec-title::before{
-  content:'';display:inline-block;
-  width:3px;height:20px;background:var(--gold);border-radius:2px;
-}
-.see-all{
-  font-size:.73rem;color:var(--gold);
-  font-weight:600;cursor:pointer;
-  transition:opacity .2s;
-}
-.see-all:active{opacity:.6;}
-
-/* ─── SCROLL ROW ─── */
-.scroll-row{
-  display:flex;overflow-x:auto;gap:12px;
-  padding:0 16px 16px;scrollbar-width:none;
-}
-.scroll-row::-webkit-scrollbar{display:none;}
-
-/* ─── VIDEO CARD 9:16 ─── */
-.vcard{flex-shrink:0;width:128px;cursor:pointer;}
-.vcard:active{transform:scale(.97);}
-.vthumb{
-  width:100%;padding-top:177.78%;
-  position:relative;border-radius:10px;overflow:hidden;
-  background:var(--b3);
-}
-.vthumb-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.thumb-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
-.thumb-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%);}
-.thumb-emoji{
-  position:relative;z-index:2;font-size:2.6rem;
-  filter:drop-shadow(0 2px 8px rgba(0,0,0,.6));
-  opacity:0;transition:opacity .2s;
-}
-.vcard:hover .thumb-emoji,.vcard:active .thumb-emoji{opacity:1;}
-.v-badge-wrap{position:absolute;top:7px;left:7px;z-index:3;}
-.v-badge{
-  display:inline-block;font-size:.58rem;font-weight:700;
-  padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;
-}
-.badge-new{background:var(--red);color:var(--white);}
-.badge-hot{background:var(--red);color:var(--white);}
-.badge-premium{background:var(--gold);color:var(--black);}
-.badge-free{background:#1a7a1a;color:var(--white);}
-.v-dur{
-  position:absolute;bottom:7px;right:7px;z-index:3;
-  background:rgba(0,0,0,.75);color:var(--white);
-  font-size:.6rem;padding:2px 6px;border-radius:4px;
-}
-.vinfo{padding:7px 2px 0;}
-.vtitle{
-  font-size:.76rem;font-weight:600;color:var(--white);
-  line-height:1.3;display:-webkit-box;
-  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.vsub{font-size:.66rem;color:var(--gray);margin-top:2px;}
-
-/* ─── CONTENT CARD 4:3 ─── */
-.ccard{flex-shrink:0;width:158px;cursor:pointer;}
-.ccard:active{transform:scale(.97);}
-.cthumb{
-  width:100%;padding-top:75%;
-  position:relative;border-radius:10px;overflow:hidden;background:var(--b3);
-}
-.cthumb-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.cthumb-emoji{
-  font-size:3rem;position:relative;z-index:2;
-  filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));
-}
-.cinfo{padding:7px 2px 0;}
-.ctitle{font-size:.78rem;font-weight:600;color:var(--white);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.cmeta{font-size:.66rem;color:var(--gray);margin-top:2px;}
-
-/* ─── CONTINUE WATCHING ─── */
-.pw-card{flex-shrink:0;width:172px;cursor:pointer;}
-.pw-thumb{
-  width:100%;padding-top:56.25%;
-  position:relative;border-radius:10px;overflow:hidden;background:var(--b3);
-}
-.pw-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.pw-emoji{font-size:2.5rem;position:relative;z-index:2;}
-.pw-bar-wrap{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);z-index:4;}
-.pw-bar{height:100%;background:var(--red);border-radius:0;}
-.pw-play{
-  position:absolute;right:8px;bottom:12px;z-index:5;
-  width:30px;height:30px;background:rgba(255,215,0,.9);
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:.8rem;
-}
-.pw-info{padding:6px 2px 0;}
-.pw-title{font-size:.76rem;font-weight:600;color:var(--white);}
-.pw-sub{font-size:.64rem;color:var(--gray);margin-top:2px;}
-
-/* ─── CATEGORIES ─── */
-.cat-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:10px;padding:0 16px 16px;
-}
-.cat-item{
-  position:relative;border-radius:10px;overflow:hidden;
-  cursor:pointer;aspect-ratio:1;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:4px;
-  transition:transform .2s;
-}
-.cat-item:active{transform:scale(.95);}
-.cat-item-bg{position:absolute;inset:0;opacity:.5;}
-.cat-lbl{
-  position:relative;z-index:2;
-  font-family:'Bebas Neue',cursive;font-size:1rem;
-  letter-spacing:.8px;color:var(--white);
-  text-shadow:0 2px 8px rgba(0,0,0,.8);
-}
-.cat-icon{font-size:1.6rem;position:relative;z-index:2;}
-
-/* ─── PROMO BANNER ─── */
-.promo{
-  margin:8px 16px 16px;
-  background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-d));
-  border-radius:14px;padding:18px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:relative;overflow:hidden;cursor:pointer;
-}
-.promo::after{
-  content:'★';position:absolute;right:-10px;top:-10px;
-  font-size:80px;color:rgba(255,255,255,.12);line-height:1;
-}
-.promo-txt h3{font-family:'Bebas Neue',cursive;font-size:1.35rem;color:var(--black);letter-spacing:.8px;}
-.promo-txt p{font-size:.72rem;color:rgba(0,0,0,.6);margin-top:2px;}
-.promo-cta{
-  background:var(--black);color:var(--gold);
-  border:none;padding:9px 14px;border-radius:8px;
-  font-family:'Poppins',sans-serif;font-weight:700;font-size:.78rem;
-  cursor:pointer;flex-shrink:0;white-space:nowrap;
-  transition:all .2s;
-}
-.promo-cta:active{background:var(--red);color:var(--white);}
-
-/* ─── BOTTOM NAV ─── */
-.bottom-nav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:480px;
-  background:var(--b2);border-top:1px solid #222;
-  display:flex;justify-content:space-around;align-items:center;
-  padding:8px 0 14px;z-index:60;
-}
-.nav-item{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:pointer;padding:2px 10px;transition:all .15s;
-}
-.nav-ico{font-size:1.2rem;}
-.nav-lbl{font-size:.62rem;color:var(--gray);font-weight:600;}
-.nav-item.active .nav-lbl{color:var(--gold);}
-.nav-item:active{transform:scale(.9);}
-.nav-center{
-  width:48px;height:48px;background:var(--gold);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
-  cursor:pointer;box-shadow:0 0 20px rgba(255,215,0,.35);
-  margin-top:-14px;border:3px solid var(--b2);
-  transition:all .2s;
-}
-.nav-center:active{background:var(--red);box-shadow:0 0 20px rgba(232,0,10,.35);}
-
-/* ═══════ SHOW DETAIL VIEW ═══════ */
-#view-show .top-bar,#view-player .top-bar{
-  display:flex;align-items:center;gap:12px;
-  padding:14px 16px;position:sticky;top:0;z-index:50;
-  background:var(--black);border-bottom:1px solid #1e1e1e;
-}
-.back-btn{
-  background:var(--b3);border:none;color:var(--white);
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1rem;cursor:pointer;flex-shrink:0;
-  transition:background .2s;
-}
-.back-btn:active{background:var(--gold);color:var(--black);}
-.bar-title{
-  font-family:'Bebas Neue',cursive;font-size:1.3rem;
-  letter-spacing:1px;color:var(--white);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-
-/* Show hero */
-.show-hero{
-  position:relative;width:100%;padding-top:62%;overflow:hidden;
-}
-.show-hero-bg{position:absolute;inset:0;}
-.show-hero-shade{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(8,8,8,1) 0%,rgba(8,8,8,.1) 70%,transparent 100%);
-}
-.show-hero-emoji{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:5rem;filter:drop-shadow(0 4px 20px rgba(0,0,0,.6));
-}
-.show-hero-info{
-  position:absolute;bottom:16px;left:16px;right:16px;z-index:3;
-}
-.show-hero-title{
-  font-family:'Bebas Neue',cursive;font-size:2.5rem;
-  color:var(--white);letter-spacing:1px;line-height:1;
-}
-.show-hero-meta{
-  display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;
-}
-.meta-pill{
-  font-size:.65rem;padding:3px 10px;border-radius:12px;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
-  color:var(--white);font-weight:600;
-}
-.meta-pill.gold{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.3);color:var(--gold);}
-.rating-pill{
-  font-size:.65rem;padding:3px 10px;border-radius:12px;
-  background:var(--gold);color:var(--black);font-weight:700;
-}
-
-/* Show body */
-.show-body{padding:16px;}
-.show-desc{font-size:.83rem;color:#aaa;line-height:1.6;margin-bottom:14px;}
-.show-cast{font-size:.75rem;color:var(--gray);margin-bottom:18px;}
-.show-cast b{color:var(--gold-l);}
-.show-actions{display:flex;gap:10px;margin-bottom:20px;}
-.btn-watch-all{
-  flex:1;background:var(--gold);color:var(--black);
-  border:none;padding:12px;border-radius:10px;
-  font-family:'Poppins',sans-serif;font-weight:800;font-size:.88rem;
-  cursor:pointer;transition:all .2s;
-}
-.btn-watch-all:active{background:var(--gold-d);}
-.btn-share{
-  background:var(--b3);color:var(--white);
-  border:1px solid var(--b4);padding:12px 16px;border-radius:10px;
-  font-family:'Poppins',sans-serif;font-size:.82rem;
-  cursor:pointer;transition:all .2s;
-}
-.btn-share:active{border-color:var(--gold);color:var(--gold);}
-
-/* Episode list */
-.ep-section-title{
-  font-family:'Bebas Neue',cursive;font-size:1.2rem;
-  letter-spacing:1px;color:var(--white);
-  display:flex;align-items:center;gap:6px;margin-bottom:12px;
-}
-.ep-section-title::before{
-  content:'';display:inline-block;width:3px;height:18px;
-  background:var(--gold);border-radius:2px;
-}
-.ep-count{
-  font-size:.7rem;color:var(--gray);
-  background:var(--b3);padding:2px 8px;border-radius:10px;
-  font-family:'Poppins',sans-serif;font-weight:500;
-}
-
-.ep-card{
-  display:flex;align-items:center;gap:12px;
-  padding:12px;background:var(--b2);border-radius:12px;
-  margin-bottom:8px;cursor:pointer;
-  border:1px solid transparent;
-  transition:all .2s;position:relative;overflow:hidden;
-}
-.ep-card:active{background:var(--b3);border-color:var(--gold-d);}
-.ep-card.locked{opacity:.7;}
-.ep-card.locked::after{
-  content:'🔒';position:absolute;right:12px;top:50%;
-  transform:translateY(-50%);font-size:.9rem;
-}
-
-.ep-num{
-  font-family:'Bebas Neue',cursive;font-size:1.6rem;
-  color:var(--gold);min-width:32px;text-align:center;line-height:1;
-}
-.ep-thumb-mini{
-  width:72px;height:72px;border-radius:8px;overflow:hidden;
-  background:var(--b3);display:flex;align-items:center;
-  justify-content:center;flex-shrink:0;font-size:1.8rem;
-  position:relative;
-}
-.ep-thumb-play{
-  position:absolute;inset:0;background:rgba(0,0,0,.3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;opacity:0;transition:opacity .2s;
-}
-.ep-card:hover .ep-thumb-play,.ep-card:active .ep-thumb-play{opacity:1;}
-.ep-info{flex:1;min-width:0;}
-.ep-title{font-size:.83rem;font-weight:600;color:var(--white);line-height:1.3;}
-.ep-desc{font-size:.7rem;color:var(--gray);margin-top:3px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.ep-meta{display:flex;gap:8px;align-items:center;margin-top:5px;}
-.ep-dur{font-size:.64rem;color:var(--gray);}
-.ep-free-tag{
-  font-size:.58rem;padding:2px 7px;border-radius:4px;
-  background:rgba(26,122,26,.3);color:#4caf50;
-  font-weight:700;border:1px solid rgba(76,175,80,.2);
-}
-
-/* ═══════ VIDEO PLAYER VIEW ═══════ */
-#view-player{background:#000;}
-.video-container{
-  width:100%;background:#000;position:relative;
-}
-video{
-  width:100%;display:block;
-  max-height:calc(100vh - 200px);
-  object-fit:contain;background:#000;
-}
-.video-loading{
-  position:absolute;inset:0;background:#000;
-  display:flex;align-items:center;justify-content:center;
-  font-size:2rem;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
-.spinner{animation:spin .8s linear infinite;}
-.player-info{padding:16px;}
-.player-show-title{font-size:.75rem;color:var(--gold);font-weight:600;margin-bottom:4px;}
-.player-ep-title{
-  font-family:'Bebas Neue',cursive;font-size:1.6rem;
-  color:var(--white);letter-spacing:.5px;line-height:1.1;
-}
-.player-ep-meta{font-size:.72rem;color:var(--gray);margin-top:5px;}
-.player-desc{font-size:.8rem;color:#999;line-height:1.5;margin-top:10px;}
-
-.next-ep-section{padding:0 16px 16px;}
-.next-ep-label{
-  font-family:'Bebas Neue',cursive;font-size:1.1rem;
-  color:var(--white);margin-bottom:10px;letter-spacing:.8px;
-  display:flex;align-items:center;gap:6px;
-}
-.next-ep-label::before{content:'';display:inline-block;width:3px;height:16px;background:var(--red);border-radius:2px;}
-
-/* ─── SEARCH OVERLAY ─── */
-#search-overlay{
-  position:fixed;inset:0;z-index:80;
-  background:var(--black);
-  transform:translateY(-100%);
-  transition:transform .3s cubic-bezier(.4,0,.2,1);
-  padding:0 0 80px;
-  overflow-y:auto;
-}
-#search-overlay.active{transform:translateY(0);}
-.search-overlay-header{
-  display:flex;align-items:center;gap:12px;
-  padding:14px 16px;border-bottom:1px solid #1e1e1e;
-  position:sticky;top:0;background:var(--black);z-index:2;
-}
-.search-big{
-  flex:1;background:var(--b3);border:1px solid var(--gold-d);
-  border-radius:12px;padding:10px 16px;
-  color:var(--white);font-family:'Poppins',sans-serif;font-size:.95rem;
-  outline:none;
-}
-.search-close{
-  background:var(--b3);border:none;color:var(--white);
-  width:38px;height:38px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1rem;cursor:pointer;flex-shrink:0;
-}
-.search-results{padding:12px 16px;}
-.search-result-item{
-  display:flex;align-items:center;gap:12px;
-  padding:12px;background:var(--b2);border-radius:12px;
-  margin-bottom:8px;cursor:pointer;transition:background .2s;
-}
-.search-result-item:active{background:var(--b3);}
-.sr-emoji{
-  width:50px;height:50px;border-radius:8px;
-  background:var(--b3);display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;flex-shrink:0;
-}
-.sr-info{flex:1;}
-.sr-title{font-size:.85rem;font-weight:600;color:var(--white);}
-.sr-meta{font-size:.7rem;color:var(--gray);margin-top:2px;}
-.search-empty{text-align:center;padding:40px 16px;color:var(--gray);font-size:.9rem;}
-
-/* ─── TOAST ─── */
-#toast{
-  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--b3);color:var(--white);border:1px solid var(--b4);
-  padding:10px 20px;border-radius:30px;font-size:.8rem;font-weight:600;
-  z-index:999;opacity:0;transition:all .3s;pointer-events:none;
-  white-space:nowrap;
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* Animations */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-.fade-up{animation:fadeUp .4s ease forwards;}
-
-.bottom-spacer{height:80px;}
+.tab{flex-shrink:0;padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--gr2);background:none;color:var(--gr);transition:all .2s;font-family:'Poppins',sans-serif;}
+.tab.on,.tab:active{background:var(--g);color:var(--bk);border-color:var(--g);}
+/* HERO BANNER */
+.hero{position:relative;width:100%;padding-top:56.25%;overflow:hidden;cursor:pointer;}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.95) 0%,rgba(8,8,8,.3) 50%,rgba(8,8,8,.1) 100%);}
+.hero-info{position:absolute;bottom:0;left:0;right:0;padding:18px 16px;z-index:3;}
+.hero-tag{display:inline-block;background:var(--rd);color:var(--wh);font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:4px;letter-spacing:.8px;margin-bottom:7px;text-transform:uppercase;}
+.hero-title{font-family:'Bebas Neue',cursive;font-size:2.2rem;line-height:1;color:var(--wh);letter-spacing:.5px;}
+.hero-title span{color:var(--g);}
+.hero-meta{font-size:.72rem;color:var(--gr);margin:5px 0 12px;}
+.hero-meta b{color:var(--gl);}
+.hero-acts{display:flex;gap:10px;}
+.btn-play{background:var(--g);color:var(--bk);border:none;padding:10px 20px;border-radius:8px;font-family:'Poppins',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;}
+.btn-wl{background:rgba(255,255,255,.08);color:var(--wh);border:1.5px solid rgba(255,255,255,.25);padding:10px 16px;border-radius:8px;font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;}
+/* SECTION */
+.sch{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 10px;}
+.stitle{font-family:'Bebas Neue',cursive;font-size:1.35rem;letter-spacing:1px;color:var(--wh);display:flex;align-items:center;gap:8px;}
+.stitle::before{content:'';display:inline-block;width:3px;height:20px;background:var(--g);border-radius:2px;}
+.sea{font-size:.73rem;color:var(--g);font-weight:600;cursor:pointer;}
+/* SCROLL ROW */
+.srow{display:flex;overflow-x:auto;gap:12px;padding:0 16px 16px;scrollbar-width:none;}
+.srow::-webkit-scrollbar{display:none;}
+/* VIDEO CARD 9:16 */
+.vc{flex-shrink:0;width:128px;cursor:pointer;}
+.vt{width:100%;padding-top:177.78%;position:relative;border-radius:10px;overflow:hidden;background:var(--b3);}
+.vt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.vt-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%);}
+.vt-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.8rem;}
+.bdg{position:absolute;top:7px;left:7px;z-index:3;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;}
+.b-new,.b-hot{background:var(--rd);color:var(--wh);}
+.b-premium{background:var(--g);color:var(--bk);}
+.b-free{background:#1a7a1a;color:var(--wh);}
+.vdur{position:absolute;bottom:7px;right:7px;z-index:3;background:rgba(0,0,0,.75);color:var(--wh);font-size:.6rem;padding:2px 6px;border-radius:4px;}
+.vi{padding:7px 2px 0;}
+.vtit{font-size:.76rem;font-weight:600;color:var(--wh);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.vsub{font-size:.66rem;color:var(--gr);margin-top:2px;}
+/* CONTENT CARD 4:3 */
+.cc{flex-shrink:0;width:158px;cursor:pointer;}
+.ct{width:100%;padding-top:75%;position:relative;border-radius:10px;overflow:hidden;background:var(--b3);}
+.ct img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.ct-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 55%);}
+.ct-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+.ci{padding:7px 2px 0;}
+.ctit{font-size:.78rem;font-weight:600;color:var(--wh);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.cmeta{font-size:.66rem;color:var(--gr);margin-top:2px;}
+/* CONTINUE WATCHING */
+.pwc{flex-shrink:0;width:172px;cursor:pointer;}
+.pwt{width:100%;padding-top:56.25%;position:relative;border-radius:10px;overflow:hidden;background:var(--b3);}
+.pwt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.pwt-fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+.pw-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%);}
+.pw-play{position:absolute;right:8px;bottom:12px;z-index:5;width:30px;height:30px;background:rgba(255,215,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;}
+.pw-bar-w{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);z-index:4;}
+.pw-bar{height:100%;background:var(--rd);}
+.pwi{padding:6px 2px 0;}
+.pwtit{font-size:.76rem;font-weight:600;color:var(--wh);}
+.pwsub{font-size:.64rem;color:var(--gr);margin-top:2px;}
+/* CATEGORIES */
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px 16px;}
+.citem{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;}
+.citem:active{transform:scale(.95);}
+.ci-bg{position:absolute;inset:0;opacity:.5;}
+.ci-lbl{position:relative;z-index:2;font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:.8px;color:var(--wh);text-shadow:0 2px 8px rgba(0,0,0,.8);}
+.ci-ico{font-size:1.6rem;position:relative;z-index:2;}
+/* PROMO */
+.promo{margin:8px 16px 16px;background:linear-gradient(135deg,var(--gd),var(--g),var(--gd));border-radius:14px;padding:18px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;cursor:pointer;}
+.promo::after{content:'★';position:absolute;right:-10px;top:-10px;font-size:80px;color:rgba(255,255,255,.12);line-height:1;}
+.ptxt h3{font-family:'Bebas Neue',cursive;font-size:1.35rem;color:var(--bk);letter-spacing:.8px;}
+.ptxt p{font-size:.72rem;color:rgba(0,0,0,.6);margin-top:2px;}
+.pcta{background:var(--bk);color:var(--g);border:none;padding:9px 14px;border-radius:8px;font-family:'Poppins',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;flex-shrink:0;white-space:nowrap;}
+/* NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--b2);border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;padding:8px 0 14px;z-index:60;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 10px;}
+.ni.on .nl{color:var(--g);}
+.ni:active{transform:scale(.9);}
+.nio{font-size:1.2rem;}
+.nl{font-size:.62rem;color:var(--gr);font-weight:600;}
+.nc{width:48px;height:48px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;box-shadow:0 0 20px rgba(255,215,0,.35);margin-top:-14px;border:3px solid var(--b2);}
+.nc:active{background:var(--rd);}
+.sp{height:80px;}
+/* SEARCH OVERLAY */
+#so{position:fixed;inset:0;z-index:80;background:var(--bk);transform:translateY(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding-bottom:80px;overflow-y:auto;}
+#so.on{transform:translateY(0);}
+.so-hd{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:var(--bk);z-index:2;}
+.so-inp{flex:1;background:var(--b3);border:1px solid var(--gd);border-radius:12px;padding:10px 16px;color:var(--wh);font-family:'Poppins',sans-serif;font-size:.95rem;outline:none;}
+.so-cl{background:var(--b3);border:none;color:var(--wh);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.so-res{padding:12px 16px;}
+.sri{display:flex;align-items:center;gap:12px;padding:12px;background:var(--b2);border-radius:12px;margin-bottom:8px;cursor:pointer;}
+.sri:active{background:var(--b3);}
+.sr-em{width:50px;height:50px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;overflow:hidden;}
+.sr-em img{width:100%;height:100%;object-fit:cover;}
+.sri-inf{flex:1;}
+.sri-t{font-size:.85rem;font-weight:600;color:var(--wh);}
+.sri-m{font-size:.7rem;color:var(--gr);margin-top:2px;}
+.sempty{text-align:center;padding:40px 16px;color:var(--gr);font-size:.9rem;}
+/* TOAST */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--b3);color:var(--wh);border:1px solid var(--b4);padding:10px 20px;border-radius:30px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+@keyframes fu{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.fu{animation:fu .4s ease forwards;}
 </style>
 </head>
 <body>
 
-<!-- ═══ POPUP ═══ -->
-<div id="popup-overlay" class="hidden">
-  <div class="popup-card">
-    <div id="popup-img-wrap"></div>
-    <div class="popup-body">
-      <div class="popup-title" id="popup-title"></div>
-      <div class="popup-sub" id="popup-sub"></div>
-      <div class="popup-actions">
-        <button class="popup-btn-main" id="popup-cta"></button>
-        <button class="popup-btn-dismiss" id="popup-dismiss"></button>
+<!-- POPUP -->
+<div id="pop" class="off">
+  <div class="pop-card">
+    <img id="pop-img" class="pop-img" src="" alt="">
+    <div class="pop-body">
+      <div class="pop-title" id="pop-title"></div>
+      <div class="pop-sub" id="pop-sub"></div>
+      <div class="pop-acts">
+        <button class="pop-cta" id="pop-cta"></button>
+        <button class="pop-dis" id="pop-dis"></button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ TOAST ═══ -->
+<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ═══ SEARCH OVERLAY ═══ -->
-<div id="search-overlay">
-  <div class="search-overlay-header">
-    <input type="text" class="search-big" placeholder="Shows, Podcasts खोजें..." id="search-input-big" oninput="doSearch(this.value)">
-    <button class="search-close" onclick="closeSearch()">✕</button>
+<!-- SEARCH OVERLAY -->
+<div id="so">
+  <div class="so-hd">
+    <input type="text" class="so-inp" id="so-inp" placeholder="Shows, Podcasts खोजें..." oninput="doSearch(this.value)">
+    <button class="so-cl" onclick="closeSO()">✕</button>
   </div>
-  <div class="search-results" id="search-results-wrap"></div>
+  <div class="so-res" id="so-res"></div>
 </div>
 
-<!-- ═══ HOME VIEW ═══ -->
-<div class="view active" id="view-home">
-
-  <!-- HEADER -->
-  <header class="top-header">
-    <div class="logo" id="site-logo" onclick="scrollToTop()"></div>
-    <div class="header-icons">
-      <button class="icon-btn" onclick="openSearch()" title="Search">🔍</button>
-      <button class="icon-btn" title="Notifications">🔔</button>
-      <button class="icon-btn" title="Profile">👤</button>
-    </div>
-  </header>
-
-  <!-- SEARCH BAR -->
-  <div class="search-wrap">
-    <div class="search-bar">
-      <span style="font-size:.9rem;color:var(--gray)">🔍</span>
-      <input type="text" placeholder="Shows, Podcasts खोजें..." onclick="openSearch()" readonly>
-    </div>
+<!-- HEADER -->
+<header>
+  <div class="logo" id="logo" onclick="window.scrollTo(0,0)"></div>
+  <div class="hicons">
+    <button class="hbtn" onclick="openSO()">🔍</button>
+    <button class="hbtn">🔔</button>
+    <button class="hbtn">👤</button>
   </div>
+</header>
 
-  <!-- TABS -->
-  <div class="tabs" id="tabs-wrap"></div>
-
-  <!-- HERO BANNER -->
-  <div class="hero-banner" id="hero-banner" onclick="heroClick()">
-    <div class="hero-inner">
-      <div class="hero-bg-base" id="hero-bg"></div>
-      <div class="hero-glow"></div>
-      <div class="hero-shade"></div>
-      <div class="hero-content">
-        <div class="hero-tag" id="hero-tag"></div>
-        <h1 class="hero-title" id="hero-title"></h1>
-        <p class="hero-meta" id="hero-meta"></p>
-        <div class="hero-actions">
-          <button class="btn-play" id="hero-play-btn">▶ अभी देखें</button>
-          <button class="btn-outline" onclick="event.stopPropagation();addWatchlist()">+ Watchlist</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONTINUE WATCHING -->
-  <div id="continue-section" style="display:none">
-    <div class="sec-head"><div class="sec-title" id="cw-title">जारी रखें</div></div>
-    <div class="scroll-row" id="continue-row"></div>
-  </div>
-
-  <!-- TRENDING SHOWS 9:16 -->
-  <div class="sec-head">
-    <div class="sec-title" id="featured-title">Trending Shows</div>
-    <span class="see-all" onclick="showToast('Explore page coming soon!')">सब देखें →</span>
-  </div>
-  <div class="scroll-row" id="featured-row"></div>
-
-  <!-- PROMO BANNER -->
-  <div class="promo" id="promo-banner">
-    <div class="promo-txt">
-      <h3 id="promo-title"></h3>
-      <p id="promo-sub"></p>
-    </div>
-    <button class="promo-cta" id="promo-cta"></button>
-  </div>
-
-  <!-- NEW RELEASES 4:3 -->
-  <div class="sec-head">
-    <div class="sec-title" id="new-releases-title">New Releases</div>
-    <span class="see-all" onclick="showToast('All releases coming soon!')">सब देखें →</span>
-  </div>
-  <div class="scroll-row" id="new-releases-row"></div>
-
-  <!-- CATEGORIES -->
-  <div class="sec-head"><div class="sec-title">Categories</div></div>
-  <div class="cat-grid" id="cat-grid"></div>
-
-  <!-- PODCASTS 4:3 -->
-  <div class="sec-head">
-    <div class="sec-title" id="podcast-title">Top Podcasts</div>
-    <span class="see-all" onclick="showToast('All podcasts coming soon!')">सब देखें →</span>
-  </div>
-  <div class="scroll-row" id="podcast-row"></div>
-
-  <div class="bottom-spacer"></div>
+<!-- SEARCH BAR -->
+<div class="srch" onclick="openSO()">
+  <span>🔍</span>
+  <p>Shows, Podcasts खोजें...</p>
 </div>
 
-<!-- ═══ SHOW DETAIL VIEW ═══ -->
-<div class="view" id="view-show">
-  <div class="top-bar">
-    <button class="back-btn" onclick="goBack('view-show','view-home')">←</button>
-    <div class="bar-title" id="show-bar-title">Show</div>
-  </div>
+<!-- TABS -->
+<div class="tabs" id="tabs"></div>
 
-  <!-- Show Hero -->
-  <div class="show-hero" id="show-hero">
-    <div class="show-hero-bg" id="show-hero-bg"></div>
-    <div class="show-hero-shade"></div>
-    <div class="show-hero-emoji" id="show-hero-emoji"></div>
-    <div class="show-hero-info">
-      <div class="show-hero-title" id="show-detail-title"></div>
-      <div class="show-hero-meta" id="show-detail-meta"></div>
+<!-- HERO -->
+<div class="hero" id="hero" onclick="heroCk()">
+  <img id="hero-img" class="hero-img" src="" alt="" onerror="this.style.display='none'">
+  <div class="hero-shade"></div>
+  <div class="hero-info">
+    <div class="hero-tag" id="hero-tag"></div>
+    <div class="hero-title" id="hero-title"></div>
+    <div class="hero-meta" id="hero-meta"></div>
+    <div class="hero-acts">
+      <button class="btn-play" onclick="event.stopPropagation();heroCk()">▶ अभी देखें</button>
+      <button class="btn-wl" onclick="event.stopPropagation();toast('Watchlist mein add! ✅')">+ Watchlist</button>
     </div>
   </div>
-
-  <!-- Show Body -->
-  <div class="show-body">
-    <p class="show-desc" id="show-detail-desc"></p>
-    <p class="show-cast" id="show-detail-cast"></p>
-    <div class="show-actions">
-      <button class="btn-watch-all" id="show-watch-btn">▶ Episode 1 से शुरू करें</button>
-      <button class="btn-share" onclick="shareShow()">↗ Share</button>
-    </div>
-
-    <!-- Episodes -->
-    <div class="ep-section-title">
-      Episodes <span class="ep-count" id="ep-count"></span>
-    </div>
-    <div id="episodes-list"></div>
-  </div>
-
-  <div class="bottom-spacer"></div>
 </div>
 
-<!-- ═══ VIDEO PLAYER VIEW ═══ -->
-<div class="view" id="view-player">
-  <div class="top-bar">
-    <button class="back-btn" id="player-back-btn">←</button>
-    <div class="bar-title" id="player-bar-title">Playing</div>
-  </div>
-
-  <!-- Video -->
-  <div class="video-container" id="video-container">
-    <div class="video-loading" id="video-loading"><span class="spinner">⏳</span></div>
-    <video id="main-video" controls playsinline preload="metadata">
-      Your browser does not support video.
-    </video>
-  </div>
-
-  <!-- Player Info -->
-  <div class="player-info">
-    <div class="player-show-title" id="player-show-title"></div>
-    <div class="player-ep-title" id="player-ep-title"></div>
-    <div class="player-ep-meta" id="player-ep-meta"></div>
-    <div class="player-desc" id="player-ep-desc"></div>
-  </div>
-
-  <!-- Next Episodes -->
-  <div class="next-ep-section">
-    <div class="next-ep-label">अगले Episodes</div>
-    <div id="next-episodes-list"></div>
-  </div>
-
-  <div class="bottom-spacer"></div>
+<!-- CONTINUE WATCHING -->
+<div id="cw-sec" style="display:none">
+  <div class="sch"><div class="stitle" id="cw-title">जारी रखें</div></div>
+  <div class="srow" id="cw-row"></div>
 </div>
 
-<!-- ═══ BOTTOM NAV ═══ -->
-<nav class="bottom-nav">
-  <div class="nav-item active" onclick="navClick(this,'home')">
-    <span class="nav-ico">🏠</span>
-    <span class="nav-lbl">Home</span>
+<!-- TRENDING 9:16 -->
+<div class="sch">
+  <div class="stitle" id="feat-title">Trending</div>
+  <span class="sea" onclick="toast('Explore soon!')">सब देखें →</span>
+</div>
+<div class="srow" id="feat-row"></div>
+
+<!-- PROMO -->
+<div class="promo" id="promo" onclick="promoCk()">
+  <div class="ptxt">
+    <h3 id="promo-title"></h3>
+    <p id="promo-sub"></p>
   </div>
-  <div class="nav-item" onclick="navClick(this,'explore')">
-    <span class="nav-ico">🧭</span>
-    <span class="nav-lbl">Explore</span>
-  </div>
-  <div class="nav-center" onclick="showToast('Live TV coming soon! 🔴')">▶</div>
-  <div class="nav-item" onclick="navClick(this,'downloads')">
-    <span class="nav-ico">💾</span>
-    <span class="nav-lbl">Downloads</span>
-  </div>
-  <div class="nav-item" onclick="navClick(this,'profile')">
-    <span class="nav-ico">👤</span>
-    <span class="nav-lbl">Profile</span>
-  </div>
+  <button class="pcta" id="promo-cta" onclick="event.stopPropagation();promoCk()"></button>
+</div>
+
+<!-- NEW RELEASES 4:3 -->
+<div class="sch">
+  <div class="stitle" id="nr-title">New Releases</div>
+  <span class="sea" onclick="toast('All releases soon!')">सब देखें →</span>
+</div>
+<div class="srow" id="nr-row"></div>
+
+<!-- CATEGORIES -->
+<div class="sch"><div class="stitle">Categories</div></div>
+<div class="cgrid" id="cat-grid"></div>
+
+<!-- PODCASTS 4:3 -->
+<div class="sch">
+  <div class="stitle" id="pod-title">Top Podcasts</div>
+  <span class="sea" onclick="toast('All podcasts soon!')">सब देखें →</span>
+</div>
+<div class="srow" id="pod-row"></div>
+
+<div class="sp"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <div class="ni on" onclick="navCk(this,'home')"><span class="nio">🏠</span><span class="nl" style="color:var(--g)">Home</span></div>
+  <div class="ni"    onclick="navCk(this,'explore')"><span class="nio">🧭</span><span class="nl">Explore</span></div>
+  <div class="nc" onclick="toast('Live TV coming soon! 🔴')">▶</div>
+  <div class="ni"    onclick="navCk(this,'downloads')"><span class="nio">💾</span><span class="nl">Downloads</span></div>
+  <div class="ni"    onclick="navCk(this,'profile')"><span class="nio">👤</span><span class="nl">Profile</span></div>
 </nav>
 
-<!-- ═══════ JAVASCRIPT ═══════ -->
 <script>
-let DATA = null;
-let currentShow = null;
-let currentEp = null;
-let watchHistory = JSON.parse(localStorage.getItem('btftv_history') || '{}');
-let viewStack = ['view-home'];
+let D=null, history_=JSON.parse(localStorage.getItem('btftv_h')||'{}');
 
-// ─── LOAD DATA ───
-async function loadData() {
-  try {
-    const res = await fetch('./data.json');
-    if (!res.ok) throw new Error('fetch failed');
-    DATA = await res.json();
-  } catch(e) {
-    // Fallback demo data if fetch fails (for local file open)
-    DATA = getDemoData();
-  }
+async function load(){
+  try{const r=await fetch('./data.json');if(!r.ok)throw 0;D=await r.json();}
+  catch{D=null;document.body.innerHTML='<p style="color:#fff;padding:20px;font-family:sans-serif">⚠️ data.json not found. Place data.json in same folder.</p>';return;}
   init();
 }
 
-function init() {
+function init(){
   setFavicon();
-  renderHeader();
+  setLogo();
   renderTabs();
   renderHero();
-  renderContinueWatching();
-  renderFeatured();
+  renderCW();
+  renderFeatured(null);
+  renderPromo();
   renderNewReleases();
   renderCategories();
   renderPodcasts();
-  renderPromo();
   showPopup();
 }
 
-// ─── FAVICON ───
-function setFavicon() {
-  const s = DATA.site;
-  const canvas = document.createElement('canvas');
-  canvas.width = 64; canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#FFD700';
-  ctx.fillRect(0,0,64,64);
-  ctx.fillStyle = '#000';
-  ctx.font = 'bold 38px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(s.favicon_emoji || '🎬', 32, 32);
-  const link = document.createElement('link');
-  link.rel = 'icon'; link.href = canvas.toDataURL();
-  document.head.appendChild(link);
-  document.title = s.name;
+function setFavicon(){
+  const f=D.site.favicon_url;
+  if(!f)return;
+  let l=document.querySelector("link[rel='icon']")||document.createElement('link');
+  l.rel='icon';l.href=f;
+  document.head.appendChild(l);
+  document.title=D.site.name;
 }
 
-// ─── HEADER LOGO ───
-function renderHeader() {
-  const s = DATA.site;
-  const logo = document.getElementById('site-logo');
-  logo.innerHTML = s.logo_text + '<span>' + s.logo_highlight + '</span>';
+function setLogo(){
+  const s=D.site;
+  document.getElementById('logo').innerHTML=s.logo_text+'<span>'+s.logo_highlight+'</span>';
 }
 
-// ─── TABS ───
-function renderTabs() {
-  const wrap = document.getElementById('tabs-wrap');
-  wrap.innerHTML = DATA.tabs.map(t =>
-    `<button class="tab${t.active?' active':''}" data-id="${t.id}" onclick="filterTab(this,'${t.id}')">${t.label}</button>`
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=D.tabs.map(t=>
+    `<button class="tab${t.active?' on':''}" onclick="tabCk(this,'${t.id}')">${t.label}</button>`
   ).join('');
 }
-
-function filterTab(el, id) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  // Filter shows
-  if (id === 'all') {
-    renderFeatured(null);
-  } else {
-    renderFeatured(id);
-  }
+function tabCk(el,id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderFeatured(id==='all'?null:id);
 }
 
-// ─── HERO BANNER ───
-function renderHero() {
-  const b = DATA.banner;
-  const show = DATA.shows.find(s => s.id === b.story_id);
-  document.getElementById('hero-bg').style.background = b.gradient || 'linear-gradient(135deg,#111,#222)';
-  document.getElementById('hero-tag').textContent = b.tag;
-  document.getElementById('hero-title').innerHTML = b.title + ' <span>' + b.title_highlight + '</span>';
-  document.getElementById('hero-meta').innerHTML =
-    b.genre + ' &nbsp;|&nbsp; <b>' + b.rating + '</b> &nbsp;|&nbsp; ' + b.language + ' · ' + b.year;
-  const playBtn = document.getElementById('hero-play-btn');
-  playBtn.textContent = '▶ अभी देखें';
-  // Add emoji overlay
-  const inner = document.querySelector('#hero-banner .hero-inner');
-  let emojiEl = document.getElementById('hero-emoji-overlay');
-  if (!emojiEl) {
-    emojiEl = document.createElement('div');
-    emojiEl.id = 'hero-emoji-overlay';
-    emojiEl.style.cssText = 'position:absolute;top:20%;right:15%;font-size:4rem;opacity:.15;z-index:1;transform:rotate(-10deg);';
-    inner.appendChild(emojiEl);
-  }
-  emojiEl.textContent = b.accent_emoji || '🎬';
+function renderHero(){
+  const b=D.banner;
+  document.getElementById('hero-img').src=b.image_url||'';
+  document.getElementById('hero-tag').textContent=b.tag;
+  document.getElementById('hero-title').innerHTML=b.title+' <span>'+b.title_highlight+'</span>';
+  document.getElementById('hero-meta').innerHTML=b.genre+' &nbsp;|&nbsp; <b>'+b.rating+'</b> &nbsp;|&nbsp; '+b.language+' · '+b.year;
+}
+function heroCk(){
+  const b=D.banner;
+  location.href='show.html?id='+b.story_id;
 }
 
-function heroClick() {
-  const b = DATA.banner;
-  openShow(b.story_id);
-}
-
-// ─── CONTINUE WATCHING ───
-function renderContinueWatching() {
-  const section = document.getElementById('continue-section');
-  const row = document.getElementById('continue-row');
-  const history = Object.values(watchHistory);
-  if (!history.length) { section.style.display = 'none'; return; }
-  section.style.display = 'block';
-  document.getElementById('cw-title').textContent =
-    DATA.continue_watching_section?.title || 'जारी रखें';
-  row.innerHTML = history.slice(0,5).map(h => {
-    const show = DATA.shows.find(s => s.id === h.showId);
-    if (!show) return '';
-    const ep = show.episodes[h.epIndex] || show.episodes[0];
-    const pct = Math.round((h.time / h.dur) * 100) || 30;
-    return `<div class="pw-card" onclick="playEpisode('${show.id}',${h.epIndex})">
-      <div class="pw-thumb" style="background:${show.gradient}">
-        <div class="pw-inner"><span class="pw-emoji">${show.emoji}</span></div>
-        <div class="thumb-shade"></div>
+function renderCW(){
+  const sec=document.getElementById('cw-sec');
+  const h=Object.values(history_);
+  if(!h.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  document.getElementById('cw-title').textContent=D.sections?.continue_watching?.title||'जारी रखें';
+  document.getElementById('cw-row').innerHTML=h.slice(0,5).map(hh=>{
+    const sh=D.shows.find(s=>s.id===hh.sid);if(!sh)return'';
+    const ep=sh.episodes[hh.ei]||sh.episodes[0];
+    const pct=Math.min(Math.round((hh.t/hh.d)*100)||25,100);
+    return`<div class="pwc" onclick="goPlay('${sh.id}',${hh.ei})">
+      <div class="pwt" style="background:${sh.gradient}">
+        <img src="${ep.thumbnail_url||''}" alt="" onerror="this.style.display='none'">
+        <div class="pwt-fb">${sh.emoji}</div>
+        <div class="pw-shade"></div>
         <div class="pw-play">▶</div>
-        <div class="pw-bar-wrap"><div class="pw-bar" style="width:${pct}%"></div></div>
+        <div class="pw-bar-w"><div class="pw-bar" style="width:${pct}%"></div></div>
       </div>
-      <div class="pw-info">
-        <div class="pw-title">${show.title}</div>
-        <div class="pw-sub">Ep ${ep.ep} • ${ep.duration}</div>
-      </div>
+      <div class="pwi"><div class="pwtit">${sh.title}</div><div class="pwsub">Ep ${ep.ep} · ${ep.duration}</div></div>
     </div>`;
   }).join('');
 }
 
-// ─── FEATURED SHOWS (9:16) ───
-function renderFeatured(filterCat) {
-  const row = document.getElementById('featured-row');
-  document.getElementById('featured-title').textContent =
-    DATA.featured_section?.title || 'Trending Shows';
-  let shows = (DATA.featured_section?.show_ids || [])
-    .map(id => DATA.shows.find(s => s.id === id))
-    .filter(Boolean);
-  if (filterCat) shows = shows.filter(s => s.category === filterCat || s.genre.toLowerCase() === filterCat);
-  if (!shows.length) shows = DATA.shows.filter(s => !filterCat || s.category === filterCat);
-  row.innerHTML = shows.map(show =>
-    `<div class="vcard fade-up" onclick="openShow('${show.id}')">
-      <div class="vthumb">
-        <div class="vthumb-inner">
-          <div class="thumb-bg" style="background:${show.gradient}"></div>
-          <div class="thumb-shade"></div>
-          <div class="thumb-emoji">${show.emoji}</div>
-        </div>
-        <div class="v-badge-wrap"><span class="v-badge badge-${show.badge_type}">${show.badge}</span></div>
-        <div class="v-dur">S1 · ${show.total_episodes} Eps</div>
+function renderFeatured(filt){
+  document.getElementById('feat-title').textContent=D.sections?.featured?.title||'Trending Shows';
+  let shows=(D.sections?.featured?.show_ids||[]).map(id=>D.shows.find(s=>s.id===id)).filter(Boolean);
+  if(filt)shows=shows.filter(s=>s.category===filt||s.genre.toLowerCase()===filt);
+  if(!shows.length&&filt)shows=D.shows.filter(s=>s.category===filt);
+  document.getElementById('feat-row').innerHTML=shows.map(s=>
+    `<div class="vc fu" onclick="location.href='show.html?id=${s.id}'">
+      <div class="vt" style="background:${s.gradient}">
+        <img src="${s.poster_url||''}" alt="${s.title}" onerror="this.style.display='none'">
+        <div class="vt-fallback" id="vf-${s.id}">${s.emoji}</div>
+        <div class="vt-shade"></div>
+        <span class="bdg b-${s.badge_type}">${s.badge}</span>
+        <span class="vdur">S1 · ${s.total_episodes} Eps</span>
       </div>
-      <div class="vinfo">
-        <div class="vtitle">${show.title}</div>
-        <div class="vsub">${show.genre} · ${show.language}</div>
-      </div>
+      <div class="vi"><div class="vtit">${s.title}</div><div class="vsub">${s.genre} · ${s.language}</div></div>
     </div>`
   ).join('');
-}
-
-// ─── NEW RELEASES (4:3) ───
-function renderNewReleases() {
-  const row = document.getElementById('new-releases-row');
-  document.getElementById('new-releases-title').textContent =
-    DATA.new_releases_section?.title || 'New Releases';
-  const shows = (DATA.new_releases_section?.show_ids || [])
-    .map(id => DATA.shows.find(s => s.id === id))
-    .filter(Boolean);
-  row.innerHTML = shows.map(show =>
-    `<div class="ccard" onclick="openShow('${show.id}')">
-      <div class="cthumb">
-        <div class="cthumb-inner">
-          <div class="thumb-bg" style="background:${show.gradient}"></div>
-          <div class="thumb-shade"></div>
-          <div class="cthumb-emoji">${show.emoji}</div>
-        </div>
-        <div class="v-badge-wrap"><span class="v-badge badge-${show.badge_type}">${show.badge}</span></div>
-        <div class="v-dur">${show.episodes[0]?.duration || ''}</div>
-      </div>
-      <div class="cinfo">
-        <div class="ctitle">${show.title}</div>
-        <div class="cmeta">${show.genre} · ${show.year}</div>
-      </div>
-    </div>`
-  ).join('');
-}
-
-// ─── CATEGORIES ───
-function renderCategories() {
-  const grid = document.getElementById('cat-grid');
-  grid.innerHTML = DATA.categories.map(c =>
-    `<div class="cat-item" onclick="filterTab(null,'${c.id}');scrollToTop()">
-      <div class="cat-item-bg" style="background:${c.gradient}"></div>
-      <span class="cat-icon">${c.emoji}</span>
-      <span class="cat-lbl">${c.label}</span>
-    </div>`
-  ).join('');
-}
-
-// ─── PODCASTS (4:3) ───
-function renderPodcasts() {
-  const row = document.getElementById('podcast-row');
-  document.getElementById('podcast-title').textContent =
-    DATA.podcast_section?.title || 'Top Podcasts';
-  const shows = (DATA.podcast_section?.show_ids || [])
-    .map(id => DATA.shows.find(s => s.id === id))
-    .filter(Boolean);
-  row.innerHTML = shows.map(show =>
-    `<div class="ccard" onclick="openShow('${show.id}')">
-      <div class="cthumb">
-        <div class="cthumb-inner">
-          <div class="thumb-bg" style="background:${show.gradient}"></div>
-          <div class="cthumb-emoji">${show.emoji}</div>
-        </div>
-        <div class="v-badge-wrap"><span class="v-badge badge-${show.badge_type}">${show.badge}</span></div>
-      </div>
-      <div class="cinfo">
-        <div class="ctitle">${show.title}</div>
-        <div class="cmeta">${show.genre} · ${show.total_episodes} Episodes</div>
-      </div>
-    </div>`
-  ).join('');
-}
-
-// ─── PROMO ───
-function renderPromo() {
-  const p = DATA.promo_banner;
-  if (!p || !p.enabled) { document.querySelector('.promo').style.display='none'; return; }
-  document.getElementById('promo-title').textContent = p.title;
-  document.getElementById('promo-sub').textContent = p.subtitle;
-  const btn = document.getElementById('promo-cta');
-  btn.textContent = p.button_text;
-  btn.onclick = () => { window.location.href = p.button_link; };
-}
-
-// ─── POPUP ───
-function showPopup() {
-  const p = DATA.popup;
-  if (!p || !p.enabled) return;
-  if (p.show_once && localStorage.getItem('btftv_popup_seen')) return;
-  const overlay = document.getElementById('popup-overlay');
-  const wrap = document.getElementById('popup-img-wrap');
-  if (p.image_url) {
-    const img = new Image();
-    img.src = p.image_url;
-    img.className = 'popup-img';
-    img.onerror = () => {
-      wrap.innerHTML = `<div class="popup-img-placeholder">${DATA.site.favicon_emoji || '🎬'}</div>`;
-    };
-    img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); };
-    wrap.innerHTML = `<div class="popup-img-placeholder">${DATA.site.favicon_emoji || '🎬'}</div>`;
-  }
-  document.getElementById('popup-title').textContent = p.title;
-  document.getElementById('popup-sub').textContent = p.subtitle;
-  const mainBtn = document.getElementById('popup-cta');
-  mainBtn.textContent = p.button_text;
-  mainBtn.onclick = () => {
-    closePopup();
-    window.location.href = p.button_link;
-  };
-  const dismissBtn = document.getElementById('popup-dismiss');
-  dismissBtn.textContent = p.dismiss_text;
-  dismissBtn.onclick = closePopup;
-  overlay.classList.remove('hidden');
-}
-
-function closePopup() {
-  const overlay = document.getElementById('popup-overlay');
-  overlay.classList.add('hidden');
-  if (DATA.popup?.show_once) localStorage.setItem('btftv_popup_seen','1');
-}
-
-// ─── OPEN SHOW ───
-function openShow(showId) {
-  currentShow = DATA.shows.find(s => s.id === showId);
-  if (!currentShow) return;
-  // Populate show view
-  document.getElementById('show-bar-title').textContent = currentShow.title;
-  document.getElementById('show-hero-bg').style.background = currentShow.gradient;
-  document.getElementById('show-hero-emoji').textContent = currentShow.emoji;
-  document.getElementById('show-detail-title').textContent = currentShow.title;
-  // Meta pills
-  const metaHTML =
-    `<span class="meta-pill">${currentShow.genre}</span>
-     <span class="meta-pill">${currentShow.language}</span>
-     <span class="meta-pill">${currentShow.year}</span>
-     <span class="rating-pill">⭐ ${currentShow.rating}</span>
-     <span class="meta-pill">${currentShow.total_episodes} Episodes</span>`;
-  document.getElementById('show-detail-meta').innerHTML = metaHTML;
-  document.getElementById('show-detail-desc').textContent = currentShow.description;
-  document.getElementById('show-detail-cast').innerHTML = '<b>Cast:</b> ' + currentShow.cast;
-  document.getElementById('ep-count').textContent = currentShow.episodes.length + ' eps';
-  // Watch button — start from first free ep
-  const firstFreeIdx = currentShow.episodes.findIndex(e => e.is_free);
-  const startIdx = firstFreeIdx >= 0 ? firstFreeIdx : 0;
-  const watchBtn = document.getElementById('show-watch-btn');
-  watchBtn.textContent = '▶ Episode 1 से शुरू करें';
-  watchBtn.onclick = () => playEpisode(currentShow.id, startIdx);
-  // Episodes list
-  renderEpisodeList(currentShow);
-  // Navigate
-  navigateTo('view-show');
-}
-
-function renderEpisodeList(show) {
-  const list = document.getElementById('episodes-list');
-  list.innerHTML = show.episodes.map((ep, idx) =>
-    `<div class="ep-card ${ep.is_free?'':'locked'}" onclick="onEpClick('${show.id}',${idx})">
-      <div class="ep-num">${ep.ep}</div>
-      <div class="ep-thumb-mini" style="background:${show.gradient}">
-        ${show.emoji}
-        <div class="ep-thumb-play">▶</div>
-      </div>
-      <div class="ep-info">
-        <div class="ep-title">${ep.title}</div>
-        <div class="ep-desc">${ep.description}</div>
-        <div class="ep-meta">
-          <span class="ep-dur">⏱ ${ep.duration}</span>
-          ${ep.is_free ? '<span class="ep-free-tag">FREE</span>' : ''}
-          <span style="font-size:.6rem;color:var(--gray)">ID: ${ep.video_id}</span>
-        </div>
-      </div>
-    </div>`
-  ).join('');
-}
-
-function onEpClick(showId, epIdx) {
-  const show = DATA.shows.find(s => s.id === showId);
-  const ep = show?.episodes[epIdx];
-  if (!ep) return;
-  if (!ep.is_free) {
-    showToast('🔒 यह Episode GOLD subscribers के लिए है');
-    return;
-  }
-  playEpisode(showId, epIdx);
-}
-
-// ─── PLAY EPISODE ───
-function playEpisode(showId, epIdx) {
-  const show = DATA.shows.find(s => s.id === showId);
-  if (!show) return;
-  const ep = show.episodes[epIdx];
-  if (!ep) return;
-  currentShow = show;
-  currentEp = { show, ep, epIdx };
-  // Populate player
-  document.getElementById('player-bar-title').textContent = 'Ep ' + ep.ep + ' – ' + ep.title;
-  document.getElementById('player-show-title').textContent = show.title + ' · ' + show.genre;
-  document.getElementById('player-ep-title').textContent = ep.title;
-  document.getElementById('player-ep-meta').textContent = 'Episode ' + ep.ep + '  ·  ' + ep.duration + '  ·  ID: ' + ep.video_id;
-  document.getElementById('player-ep-desc').textContent = ep.description;
-  // Load video
-  const video = document.getElementById('main-video');
-  const loading = document.getElementById('video-loading');
-  loading.style.display = 'flex';
-  video.style.opacity = '0';
-  video.src = ep.video_url;
-  video.load();
-  video.oncanplay = () => {
-    loading.style.display = 'none';
-    video.style.opacity = '1';
-    video.play().catch(()=>{});
-  };
-  video.onerror = () => {
-    loading.innerHTML = '<span>⚠️ Video load failed</span>';
-  };
-  // Save watch history
-  const key = showId + '_' + epIdx;
-  watchHistory[key] = { showId, epIdx, time: 0, dur: 99999 };
-  localStorage.setItem('btftv_history', JSON.stringify(watchHistory));
-  video.ontimeupdate = () => {
-    watchHistory[key].time = Math.round(video.currentTime);
-    watchHistory[key].dur = Math.round(video.duration) || 99999;
-    localStorage.setItem('btftv_history', JSON.stringify(watchHistory));
-  };
-  // Next episodes
-  renderNextEpisodes(show, epIdx);
-  // Back button
-  const fromShow = viewStack[viewStack.length - 1] === 'view-show';
-  document.getElementById('player-back-btn').onclick = () => {
-    video.pause();
-    video.src = '';
-    goBack('view-player', fromShow ? 'view-show' : 'view-home');
-  };
-  navigateTo('view-player');
-}
-
-function renderNextEpisodes(show, currentIdx) {
-  const list = document.getElementById('next-episodes-list');
-  const nextEps = show.episodes.slice(currentIdx + 1, currentIdx + 4);
-  if (!nextEps.length) { list.innerHTML = '<p style="color:var(--gray);font-size:.8rem">कोई अगला episode नहीं</p>'; return; }
-  list.innerHTML = nextEps.map((ep, i) => {
-    const idx = currentIdx + 1 + i;
-    return `<div class="ep-card ${ep.is_free?'':'locked'}" onclick="onEpClick('${show.id}',${idx})">
-      <div class="ep-num">${ep.ep}</div>
-      <div class="ep-thumb-mini" style="background:${show.gradient}">${show.emoji}<div class="ep-thumb-play">▶</div></div>
-      <div class="ep-info">
-        <div class="ep-title">${ep.title}</div>
-        <div class="ep-meta"><span class="ep-dur">⏱ ${ep.duration}</span>${ep.is_free?'<span class="ep-free-tag">FREE</span>':''}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── NAVIGATION ───
-function navigateTo(viewId) {
-  const current = viewStack[viewStack.length - 1];
-  if (current === viewId) return;
-  const prevEl = document.getElementById(current);
-  const nextEl = document.getElementById(viewId);
-  prevEl.classList.add('slide-left');
-  prevEl.classList.remove('active');
-  nextEl.classList.add('active');
-  nextEl.classList.remove('slide-left');
-  nextEl.scrollTop = 0;
-  viewStack.push(viewId);
-}
-
-function goBack(fromId, toId) {
-  const fromEl = document.getElementById(fromId);
-  const toEl = document.getElementById(toId);
-  fromEl.classList.remove('active');
-  fromEl.style.transform = 'translateX(100%)';
-  setTimeout(() => { fromEl.style.transform = ''; }, 350);
-  toEl.classList.remove('slide-left');
-  toEl.classList.add('active');
-  viewStack.pop();
-}
-
-// ─── SEARCH ───
-function openSearch() {
-  document.getElementById('search-overlay').classList.add('active');
-  setTimeout(() => document.getElementById('search-input-big').focus(), 300);
-}
-function closeSearch() {
-  document.getElementById('search-overlay').classList.remove('active');
-  document.getElementById('search-input-big').value = '';
-  document.getElementById('search-results-wrap').innerHTML = '';
-}
-function doSearch(q) {
-  const wrap = document.getElementById('search-results-wrap');
-  if (!q.trim()) { wrap.innerHTML = ''; return; }
-  const ql = q.toLowerCase();
-  const results = DATA.shows.filter(s =>
-    s.title.toLowerCase().includes(ql) ||
-    s.genre.toLowerCase().includes(ql) ||
-    s.description.toLowerCase().includes(ql)
-  );
-  if (!results.length) {
-    wrap.innerHTML = '<div class="search-empty">🔍 कोई result नहीं मिला</div>';
-    return;
-  }
-  wrap.innerHTML = results.map(s =>
-    `<div class="search-result-item" onclick="closeSearch();openShow('${s.id}')">
-      <div class="sr-emoji" style="background:${s.gradient}">${s.emoji}</div>
-      <div class="sr-info">
-        <div class="sr-title">${s.title}</div>
-        <div class="sr-meta">${s.genre} · ${s.language} · ${s.episodes.length} Episodes</div>
-      </div>
-      <span class="v-badge badge-${s.badge_type}">${s.badge}</span>
-    </div>`
-  ).join('');
-}
-
-// ─── UTILS ───
-function scrollToTop() {
-  document.getElementById('view-home').scrollTop = 0;
-}
-function addWatchlist() {
-  showToast('Watchlist mein add ho gaya! ✅');
-}
-function shareShow() {
-  if (navigator.share && currentShow) {
-    navigator.share({ title: currentShow.title, text: currentShow.description, url: window.location.href });
-  } else {
-    showToast('Link copy ho gaya! 🔗');
-  }
-}
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-function navClick(el, tab) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-  if (tab === 'home') {
-    // go back to home
-    ['view-show','view-player'].forEach(v => {
-      const el = document.getElementById(v);
-      el.classList.remove('active','slide-left');
+  // Hide fallback emoji when image loads
+  shows.forEach(s=>{
+    const imgs=document.querySelectorAll(`[onclick*="${s.id}"] .vt img`);
+    imgs.forEach(img=>{
+      img.onload=()=>{const fb=img.parentElement.querySelector('.vt-fallback');if(fb)fb.style.display='none';};
     });
-    document.getElementById('view-home').classList.add('active');
-    viewStack = ['view-home'];
-  } else {
-    showToast(tab.charAt(0).toUpperCase()+tab.slice(1) + ' coming soon!');
-  }
+  });
 }
 
-// ─── DEMO FALLBACK DATA ───
-function getDemoData() {
-  return {
-    site: { name:"BTF TV", logo_text:"BTF", logo_highlight:"TV", favicon_emoji:"🎬" },
-    popup: { enabled:true, image_url:"", title:"BTF TV में आपका स्वागत है! 🎬", subtitle:"Best stories, best entertainment.", button_text:"Explore Now", button_link:"#", dismiss_text:"Skip", show_once:true },
-    banner: { story_id:"gungi", tag:"🔥 Trending", title:"Gungi", title_highlight:"Season 1", description:"Ek aisi kahani...", genre:"Drama", rating:"18+", year:"2026", language:"Hindi", gradient:"linear-gradient(135deg,#1a0a0a,#3d0000)", accent_emoji:"🤫" },
-    tabs: [{ id:"all", label:"सभी", active:true },{ id:"drama", label:"Drama" },{ id:"horror", label:"Horror" }],
-    categories: [
-      { id:"horror", label:"Horror", emoji:"👻", gradient:"linear-gradient(135deg,#1a0005,#5c001a)" },
-      { id:"romance", label:"Romance", emoji:"💕", gradient:"linear-gradient(135deg,#0a001a,#3d0066)" },
-      { id:"drama", label:"Drama", emoji:"🎭", gradient:"linear-gradient(135deg,#0f1a00,#2e5c00)" }
-    ],
-    shows: [{
-      id:"gungi", title:"Gungi", emoji:"🤫", genre:"Drama", category:"drama",
-      badge:"NEW", badge_type:"new", rating:"8.4", language:"Hindi", year:"2026",
-      description:"Gungi ki kahani.", total_episodes:3,
-      gradient:"linear-gradient(135deg,#1a0a0a,#3d0000)", accent_emoji:"🤫", cast:"Priya Sharma",
-      episodes:[
-        { ep:1, title:"Khamoshi Ka Arambh", description:"Pehla ep.", video_id:"GUNGI1", video_url:"https://www.w3schools.com/html/mov_bbb.mp4", duration:"24 min", is_free:true },
-        { ep:2, title:"Ankhon Ki Zubaan", description:"Doosra ep.", video_id:"GUNGI2", video_url:"https://www.w3schools.com/html/mov_bbb.mp4", duration:"27 min", is_free:true },
-        { ep:3, title:"Toota Hua Sheeshe", description:"Teesra ep.", video_id:"GUNGI3", video_url:"https://www.w3schools.com/html/mov_bbb.mp4", duration:"31 min", is_free:false }
-      ]
-    }],
-    featured_section: { title:"Trending Shows", show_ids:["gungi"] },
-    new_releases_section: { title:"New Releases", show_ids:["gungi"] },
-    podcast_section: { title:"Top Podcasts", show_ids:[] },
-    promo_banner: { enabled:true, title:"BTF GOLD", subtitle:"Premium content unlock karein", button_text:"₹49/mo →", button_link:"#" },
-    continue_watching_section: { enabled:true, title:"जारी रखें" }
-  };
+function renderNewReleases(){
+  document.getElementById('nr-title').textContent=D.sections?.new_releases?.title||'New Releases';
+  const shows=(D.sections?.new_releases?.show_ids||[]).map(id=>D.shows.find(s=>s.id===id)).filter(Boolean);
+  document.getElementById('nr-row').innerHTML=shows.map(s=>
+    `<div class="cc" onclick="location.href='show.html?id=${s.id}'">
+      <div class="ct" style="background:${s.gradient}">
+        <img src="${s.banner_url||s.poster_url||''}" alt="${s.title}" onerror="this.style.display='none'">
+        <div class="ct-fallback">${s.emoji}</div>
+        <div class="ct-shade"></div>
+        <span class="bdg b-${s.badge_type}">${s.badge}</span>
+        <span class="vdur">${s.episodes[0]?.duration||''}</span>
+      </div>
+      <div class="ci"><div class="ctit">${s.title}</div><div class="cmeta">${s.genre} · ${s.year}</div></div>
+    </div>`
+  ).join('');
 }
 
-// ─── START ───
-loadData();
+function renderCategories(){
+  document.getElementById('cat-grid').innerHTML=D.categories.map(c=>
+    `<div class="citem" onclick="tabCk2('${c.id}')">
+      <div class="ci-bg" style="background:${c.gradient}"></div>
+      <span class="ci-ico">${c.emoji}</span>
+      <span class="ci-lbl">${c.label}</span>
+    </div>`
+  ).join('');
+}
+function tabCk2(id){
+  document.querySelectorAll('.tab').forEach(t=>{
+    if(t.dataset&&t.getAttribute('onclick')?.includes("'"+id+"'")){t.classList.add('on');}else{t.classList.remove('on');}
+  });
+  renderFeatured(id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderPodcasts(){
+  document.getElementById('pod-title').textContent=D.sections?.podcasts?.title||'Top Podcasts';
+  const shows=(D.sections?.podcasts?.show_ids||[]).map(id=>D.shows.find(s=>s.id===id)).filter(Boolean);
+  document.getElementById('pod-row').innerHTML=shows.map(s=>
+    `<div class="cc" onclick="location.href='show.html?id=${s.id}'">
+      <div class="ct" style="background:${s.gradient}">
+        <img src="${s.banner_url||s.poster_url||''}" alt="${s.title}" onerror="this.style.display='none'">
+        <div class="ct-fallback">${s.emoji}</div>
+        <div class="ct-shade"></div>
+        <span class="bdg b-${s.badge_type}">${s.badge}</span>
+      </div>
+      <div class="ci"><div class="ctit">${s.title}</div><div class="cmeta">${s.genre} · ${s.total_episodes} Eps</div></div>
+    </div>`
+  ).join('');
+}
+
+function renderPromo(){
+  const p=D.promo_banner;
+  const el=document.getElementById('promo');
+  if(!p||!p.enabled){el.style.display='none';return;}
+  document.getElementById('promo-title').textContent=p.title;
+  document.getElementById('promo-sub').textContent=p.subtitle;
+  document.getElementById('promo-cta').textContent=p.button_text;
+}
+function promoCk(){const p=D.promo_banner;if(p?.button_link)location.href=p.button_link;}
+
+function showPopup(){
+  const p=D.popup;
+  if(!p||!p.enabled)return;
+  if(p.show_once&&localStorage.getItem('btftv_pop'))return;
+  const el=document.getElementById('pop');
+  const img=document.getElementById('pop-img');
+  img.src=p.image_url||'';
+  img.onerror=()=>img.style.display='none';
+  document.getElementById('pop-title').textContent=p.title;
+  document.getElementById('pop-sub').textContent=p.subtitle;
+  document.getElementById('pop-cta').textContent=p.button_text;
+  document.getElementById('pop-cta').onclick=()=>{closePopup();location.href=p.button_link;};
+  document.getElementById('pop-dis').textContent=p.dismiss_text;
+  document.getElementById('pop-dis').onclick=closePopup;
+  setTimeout(()=>el.classList.remove('off'),400);
+}
+function closePopup(){
+  document.getElementById('pop').classList.add('off');
+  if(D.popup?.show_once)localStorage.setItem('btftv_pop','1');
+}
+
+function goPlay(sid,ei){location.href='player.html?sid='+sid+'&ei='+ei;}
+
+function openSO(){document.getElementById('so').classList.add('on');setTimeout(()=>document.getElementById('so-inp').focus(),300);}
+function closeSO(){document.getElementById('so').classList.remove('on');document.getElementById('so-inp').value='';document.getElementById('so-res').innerHTML='';}
+function doSearch(q){
+  const w=document.getElementById('so-res');
+  if(!q.trim()){w.innerHTML='';return;}
+  const ql=q.toLowerCase();
+  const res=D.shows.filter(s=>s.title.toLowerCase().includes(ql)||s.genre.toLowerCase().includes(ql)||s.description.toLowerCase().includes(ql));
+  if(!res.length){w.innerHTML='<div class="sempty">🔍 कोई result नहीं</div>';return;}
+  w.innerHTML=res.map(s=>
+    `<div class="sri" onclick="closeSO();location.href='show.html?id=${s.id}'">
+      <div class="sr-em" style="background:${s.gradient}"><img src="${s.poster_url}" alt="" onerror="this.style.display='none'">${s.emoji}</div>
+      <div class="sri-inf"><div class="sri-t">${s.title}</div><div class="sri-m">${s.genre} · ${s.language} · ${s.episodes.length} Eps</div></div>
+      <span class="bdg b-${s.badge_type}">${s.badge}</span>
+    </div>`
+  ).join('');
+}
+
+function navCk(el,tab){
+  document.querySelectorAll('.ni').forEach(n=>{n.classList.remove('on');n.querySelector('.nl').style.color='';});
+  el.classList.add('on');el.querySelector('.nl').style.color='var(--g)';
+  if(tab!=='home')toast(tab.charAt(0).toUpperCase()+tab.slice(1)+' coming soon!');
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+load();
 </script>
 </body>
 </html>
