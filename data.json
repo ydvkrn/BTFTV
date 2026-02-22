@@ -54,9 +54,9 @@
   "shows": [
     {
       "id": "gungi",
-      "title": "Gungi",
-      "poster_url": "https://placehold.co/300x533/1a0a0a/ffffff?text=GUNGI",
-      "banner_url": "https://placehold.co/480x270/1a0a0a/ffffff?text=Gungi+Story",
+      "title": "Billionaire Driver",
+      "poster_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
+      "banner_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
       "emoji": "🤫",
       "genre": "Drama",
       "category": "drama",
@@ -70,7 +70,7 @@
       "gradient": "linear-gradient(135deg,#1a0a0a,#3d0000)",
       "cast": "Priya Sharma, Rahul Verma",
       "episodes": [
-        { "ep":1, "title":"Khamoshi Ka Arambh",  "description":"Gungi ka pehla din school mein — jahan words nahi, emotions bol uthte hain.", "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+1", "video_id":"GUNGI1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"24 min", "is_free":true  },
+        { "ep":1, "title":"Khamoshi Ka Arambh",  "description":"Gungi ka pehla din school mein — jahan words nahi, emotions bol uthte hain.", "thumbnail_url":"https://i.postimg.cc/mkDmSNsy/image.jpg", "video_id":"GUNGI1", "video_url":"https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlxc8jjvnmnmpf.mp4", "duration":"24 min", "is_free":true  },
         { "ep":2, "title":"Ankhon Ki Zubaan",    "description":"Gungi ko pata chalta hai ki uska dost asli nahi tha.",                     "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+2", "video_id":"GUNGI2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"27 min", "is_free":true  },
         { "ep":3, "title":"Toota Hua Sheeshe",   "description":"Ghar mein andhera chhaya hai — par Gungi ne apni awaaz dhundh li hai.",   "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+3", "video_id":"GUNGI3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"31 min", "is_free":false },
         { "ep":4, "title":"Lahoo Ka Rang",        "description":"Sach saamne aata hai — aur Gungi ka dard aag ban jaata hai.",            "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+4", "video_id":"GUNGI4", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"29 min", "is_free":false },
