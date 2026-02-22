@@ -4,20 +4,20 @@
     "logo_text": "BTF",
     "logo_highlight": "TV",
     "tagline": "Your Story, Your World",
-    "favicon_emoji": "🎬",
+    "favicon_url": "https://placehold.co/64x64/FFD700/000000?text=B",
     "primary_color": "#FFD700",
     "accent_color": "#E8000A"
   },
 
   "popup": {
     "enabled": true,
-    "image_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
+    "image_url": "https://placehold.co/420x220/1a0a0a/FFD700?text=BTF+GOLD+Launch",
     "title": "BTF GOLD Launch! 🌟",
     "subtitle": "Pehle 30 din bilkul FREE — Ab subscribe karein!",
     "button_text": "Abhi Claim Karein",
     "button_link": "#subscribe",
     "dismiss_text": "Baad Mein",
-    "show_once": true
+    "show_once": false
   },
 
   "banner": {
@@ -26,37 +26,37 @@
     "title": "Dark Rajmahal",
     "title_highlight": "Season 2",
     "description": "Ek aisi kahani jahan mohabbat aur dhoka ek hi chehra pahante hain...",
+    "image_url": "https://placehold.co/480x270/1a0800/FFD700?text=Dark+Rajmahal+Banner",
     "genre": "Drama • Thriller",
     "rating": "18+",
     "year": "2026",
-    "language": "Hindi",
-    "gradient": "linear-gradient(135deg, #1a0800 0%, #0d0d0d 60%, #200005 100%)",
-    "accent_emoji": "👑"
+    "language": "Hindi"
   },
 
   "tabs": [
     { "id": "all",       "label": "सभी",       "active": true },
     { "id": "series",    "label": "Web Series" },
     { "id": "podcast",   "label": "Podcasts"   },
-    { "id": "audiobook", "label": "Audiobooks" },
     { "id": "comedy",    "label": "Comedy"     },
     { "id": "horror",    "label": "Horror"     },
     { "id": "romance",   "label": "Romance"    }
   ],
 
   "categories": [
-    { "id": "horror",    "label": "Horror",    "emoji": "👻", "gradient": "linear-gradient(135deg,#1a0005,#5c001a)" },
-    { "id": "romance",   "label": "Romance",   "emoji": "💕", "gradient": "linear-gradient(135deg,#0a001a,#3d0066)" },
-    { "id": "drama",     "label": "Drama",     "emoji": "🎭", "gradient": "linear-gradient(135deg,#0f1a00,#2e5c00)" },
-    { "id": "thriller",  "label": "Thriller",  "emoji": "🔪", "gradient": "linear-gradient(135deg,#1a0500,#5c1a00)" },
-    { "id": "comedy",    "label": "Comedy",    "emoji": "😂", "gradient": "linear-gradient(135deg,#1a1500,#4d3d00)" },
-    { "id": "podcast",   "label": "Podcast",   "emoji": "🎙", "gradient": "linear-gradient(135deg,#001a1a,#004d4d)" }
+    { "id": "horror",   "label": "Horror",   "emoji": "👻", "gradient": "linear-gradient(135deg,#1a0005,#5c001a)" },
+    { "id": "romance",  "label": "Romance",  "emoji": "💕", "gradient": "linear-gradient(135deg,#0a001a,#3d0066)" },
+    { "id": "drama",    "label": "Drama",    "emoji": "🎭", "gradient": "linear-gradient(135deg,#0f1a00,#2e5c00)" },
+    { "id": "thriller", "label": "Thriller", "emoji": "🔪", "gradient": "linear-gradient(135deg,#1a0500,#5c1a00)" },
+    { "id": "comedy",   "label": "Comedy",   "emoji": "😂", "gradient": "linear-gradient(135deg,#1a1500,#4d3d00)" },
+    { "id": "podcast",  "label": "Podcast",  "emoji": "🎙", "gradient": "linear-gradient(135deg,#001a1a,#004d4d)" }
   ],
 
   "shows": [
     {
       "id": "gungi",
       "title": "Gungi",
+      "poster_url": "https://placehold.co/300x533/1a0a0a/ffffff?text=GUNGI",
+      "banner_url": "https://placehold.co/480x270/1a0a0a/ffffff?text=Gungi+Story",
       "emoji": "🤫",
       "genre": "Drama",
       "category": "drama",
@@ -68,68 +68,21 @@
       "description": "Gungi ek aisi ladki ki kahani hai jo bol nahi sakti — lekin uski aankhein poori duniya ki zubaan bolti hain. Yeh sirf silence nahi, yeh ek revolt hai.",
       "total_episodes": 6,
       "gradient": "linear-gradient(135deg,#1a0a0a,#3d0000)",
-      "accent_emoji": "🤫",
       "cast": "Priya Sharma, Rahul Verma",
       "episodes": [
-        {
-          "ep": 1,
-          "title": "Khamoshi Ka Arambh",
-          "description": "Gungi ka pehla din school mein — jahan words nahi, emotions bol uthte hain.",
-          "video_id": "GUNGI1",
-          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
-          "duration": "24 min",
-          "is_free": true
-        },
-        {
-          "ep": 2,
-          "title": "Ankhon Ki Zubaan",
-          "description": "Gungi ko pata chalta hai ki uska dost asli nahi tha — aansuon mein pooch chalti hai.",
-          "video_id": "GUNGI2",
-          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
-          "duration": "27 min",
-          "is_free": true
-        },
-        {
-          "ep": 3,
-          "title": "Toota Hua Sheeshe",
-          "description": "Ghar mein andhera chhaya hai — par Gungi ne apni awaaz dhundh li hai.",
-          "video_id": "GUNGI3",
-          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
-          "duration": "31 min",
-          "is_free": false
-        },
-        {
-          "ep": 4,
-          "title": "Lahoo Ka Rang",
-          "description": "Sach saamne aata hai — aur Gungi ka dard aag ban jaata hai.",
-          "video_id": "GUNGI4",
-          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
-          "duration": "29 min",
-          "is_free": false
-        },
-        {
-          "ep": 5,
-          "title": "Judwa Chehra",
-          "description": "Dhoka ek baar aur — ab waqt hai uthne ka.",
-          "video_id": "GUNGI5",
-          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
-          "duration": "35 min",
-          "is_free": false
-        },
-        {
-          "ep": 6,
-          "title": "Khamoshi Tooti",
-          "description": "Aakhri episode — Gungi ki pehli aur aakhri awaaz.",
-          "video_id": "GUNGI6",
-          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
-          "duration": "42 min",
-          "is_free": false
-        }
+        { "ep":1, "title":"Khamoshi Ka Arambh",  "description":"Gungi ka pehla din school mein — jahan words nahi, emotions bol uthte hain.", "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+1", "video_id":"GUNGI1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"24 min", "is_free":true  },
+        { "ep":2, "title":"Ankhon Ki Zubaan",    "description":"Gungi ko pata chalta hai ki uska dost asli nahi tha.",                     "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+2", "video_id":"GUNGI2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"27 min", "is_free":true  },
+        { "ep":3, "title":"Toota Hua Sheeshe",   "description":"Ghar mein andhera chhaya hai — par Gungi ne apni awaaz dhundh li hai.",   "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+3", "video_id":"GUNGI3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"31 min", "is_free":false },
+        { "ep":4, "title":"Lahoo Ka Rang",        "description":"Sach saamne aata hai — aur Gungi ka dard aag ban jaata hai.",            "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+4", "video_id":"GUNGI4", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"29 min", "is_free":false },
+        { "ep":5, "title":"Judwa Chehra",         "description":"Dhoka ek baar aur — ab waqt hai uthne ka.",                              "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+5", "video_id":"GUNGI5", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"35 min", "is_free":false },
+        { "ep":6, "title":"Khamoshi Tooti",       "description":"Aakhri episode — Gungi ki pehli aur aakhri awaaz.",                      "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+6", "video_id":"GUNGI6", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"42 min", "is_free":false }
       ]
     },
     {
       "id": "dark-rajmahal",
       "title": "Dark Rajmahal",
+      "poster_url": "https://placehold.co/300x533/1a0800/FFD700?text=Dark+Rajmahal",
+      "banner_url": "https://placehold.co/480x270/1a0800/FFD700?text=Dark+Rajmahal+S2",
       "emoji": "👑",
       "genre": "Thriller",
       "category": "thriller",
@@ -139,24 +92,21 @@
       "language": "Hindi",
       "year": "2026",
       "description": "Rajmahal ke parde ke peeche chhupe raaz — pyaar, dhoka, aur khoon ki dastak. Ek royal thriller jo aapki neend uda dega.",
-      "total_episodes": 8,
+      "total_episodes": 4,
       "gradient": "linear-gradient(135deg,#1a0800,#3d2000)",
-      "accent_emoji": "👑",
       "cast": "Vikram Singh, Neha Kapoor",
       "episodes": [
-        { "ep": 1, "title": "Taaj Ka Boj", "description": "Rajmahal mein aate hi Arjun ko pehla raaz milta hai.", "video_id": "RAJMAHAL1", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "38 min", "is_free": true },
-        { "ep": 2, "title": "Khoon Ka Dhara", "description": "Raat ke andheron mein ek laash milti hai — aur shak sab par.", "video_id": "RAJMAHAL2", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "41 min", "is_free": true },
-        { "ep": 3, "title": "Woh Raat", "description": "10 saal purani raat ka raaz khulne lagta hai.", "video_id": "RAJMAHAL3", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "44 min", "is_free": false },
-        { "ep": 4, "title": "Aaina Jhooth Bolta Hai", "description": "Rani ka asli chehra saamne aata hai.", "video_id": "RAJMAHAL4", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "39 min", "is_free": false },
-        { "ep": 5, "title": "Tooti Zanjeerein", "description": "Arjun ko pata chalta hai — yeh sab ek saazish thi.", "video_id": "RAJMAHAL5", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "47 min", "is_free": false },
-        { "ep": 6, "title": "Aakhri Daav", "description": "Ek bhayankar sach — koi nahi bachega.", "video_id": "RAJMAHAL6", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "52 min", "is_free": false },
-        { "ep": 7, "title": "Rajmahal Jalta Hai", "description": "Sab kuch khatam hone wala hai — ya shuru?", "video_id": "RAJMAHAL7", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "55 min", "is_free": false },
-        { "ep": 8, "title": "Ant Ya Shuruat", "description": "Final episode — ek aisa twist jo sab badal de.", "video_id": "RAJMAHAL8", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "58 min", "is_free": false }
+        { "ep":1, "title":"Taaj Ka Boj",       "description":"Rajmahal mein aate hi Arjun ko pehla raaz milta hai.", "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+1", "video_id":"RAJMAHAL1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"38 min", "is_free":true  },
+        { "ep":2, "title":"Khoon Ka Dhara",    "description":"Raat ke andheron mein ek laash milti hai.",           "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+2", "video_id":"RAJMAHAL2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"41 min", "is_free":true  },
+        { "ep":3, "title":"Woh Raat",          "description":"10 saal purani raat ka raaz khulne lagta hai.",       "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+3", "video_id":"RAJMAHAL3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"44 min", "is_free":false },
+        { "ep":4, "title":"Aaina Jhooth Bolta","description":"Rani ka asli chehra saamne aata hai.",               "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+4", "video_id":"RAJMAHAL4", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"39 min", "is_free":false }
       ]
     },
     {
       "id": "zulmat-ki-raatein",
       "title": "Zulmat Ki Raatein",
+      "poster_url": "https://placehold.co/300x533/0d0020/c0c0ff?text=Zulmat",
+      "banner_url": "https://placehold.co/480x270/0d0020/c0c0ff?text=Zulmat+Ki+Raatein",
       "emoji": "🌑",
       "genre": "Horror",
       "category": "horror",
@@ -166,43 +116,20 @@
       "language": "Hindi",
       "year": "2026",
       "description": "Ek haunted haveli, teen dost, aur ek curse jo 100 saal se jagta aa raha hai. Darr guarantee hai.",
-      "total_episodes": 5,
+      "total_episodes": 3,
       "gradient": "linear-gradient(135deg,#0d0020,#1a0030)",
-      "accent_emoji": "🌑",
-      "cast": "Ananya Roy, Dev Sharma, Kiran Mehta",
+      "cast": "Ananya Roy, Dev Sharma",
       "episodes": [
-        { "ep": 1, "title": "Aahat", "description": "Pehli raat — pehli awaaz.", "video_id": "ZULMAT1", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "32 min", "is_free": true },
-        { "ep": 2, "title": "Deewar Ka Saaya", "description": "Deewar par khoon ke nishaan milte hain.", "video_id": "ZULMAT2", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "28 min", "is_free": true },
-        { "ep": 3, "title": "Buri Aatma", "description": "Teesra dost gaaib ho jaata hai.", "video_id": "ZULMAT3", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "35 min", "is_free": false },
-        { "ep": 4, "title": "Curse Ka Raaz", "description": "100 saal purana sach saamne aata hai.", "video_id": "ZULMAT4", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "40 min", "is_free": false },
-        { "ep": 5, "title": "Mukti", "description": "Aakhri raat — sirf ek bachega.", "video_id": "ZULMAT5", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "45 min", "is_free": false }
-      ]
-    },
-    {
-      "id": "mohabbat-ka-andhera",
-      "title": "Mohabbat Ka Andhera",
-      "emoji": "💔",
-      "genre": "Romance",
-      "category": "romance",
-      "badge": "GOLD",
-      "badge_type": "premium",
-      "rating": "8.9",
-      "language": "Hindi",
-      "year": "2026",
-      "description": "Do dil, ek dard — mohabbat ki woh kahani jo aapko rula degi aur hasaegi bhi.",
-      "total_episodes": 10,
-      "gradient": "linear-gradient(135deg,#1a0010,#3d0030)",
-      "accent_emoji": "💔",
-      "cast": "Sneha Patel, Arjun Nair",
-      "episodes": [
-        { "ep": 1, "title": "Pehli Nazar", "description": "Woh pehli mulaqat jo sab badal deti hai.", "video_id": "MOHABBAT1", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "26 min", "is_free": true },
-        { "ep": 2, "title": "Dil Ka Darwaza", "description": "Pyaar hone lagta hai — par dard bhi.", "video_id": "MOHABBAT2", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "29 min", "is_free": false },
-        { "ep": 3, "title": "Judai", "description": "Woh chali gayi — aur woh ruka nahi.", "video_id": "MOHABBAT3", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "31 min", "is_free": false }
+        { "ep":1, "title":"Aahat",         "description":"Pehli raat — pehli awaaz.", "thumbnail_url":"https://placehold.co/160x90/0d0020/ffffff?text=Ep+1", "video_id":"ZULMAT1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"32 min", "is_free":true  },
+        { "ep":2, "title":"Deewar Ka Saaya","description":"Deewar par khoon ke nishaan.", "thumbnail_url":"https://placehold.co/160x90/0d0020/ffffff?text=Ep+2", "video_id":"ZULMAT2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"28 min", "is_free":true  },
+        { "ep":3, "title":"Buri Aatma",    "description":"Teesra dost gaaib ho jaata hai.", "thumbnail_url":"https://placehold.co/160x90/0d0020/ffffff?text=Ep+3", "video_id":"ZULMAT3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"35 min", "is_free":false }
       ]
     },
     {
       "id": "hasi-ke-rang",
       "title": "Hasi Ke Rang",
+      "poster_url": "https://placehold.co/300x533/1a1500/ffffff?text=Hasi+Ke+Rang",
+      "banner_url": "https://placehold.co/480x270/1a1500/FFD700?text=Hasi+Ke+Rang",
       "emoji": "😂",
       "genre": "Comedy",
       "category": "comedy",
@@ -212,19 +139,20 @@
       "language": "Hindi",
       "year": "2026",
       "description": "Ek family comedy jo hasaate hasaate aansu de jaayegi — pyaar, pagalpan aur poori nautanki!",
-      "total_episodes": 12,
+      "total_episodes": 3,
       "gradient": "linear-gradient(135deg,#1a1500,#4d3d00)",
-      "accent_emoji": "😂",
       "cast": "Comedy Team BTF",
       "episodes": [
-        { "ep": 1, "title": "Shuruaat Ka Tamasha", "description": "Pehle din se hi drama shuru.", "video_id": "HASI1", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "22 min", "is_free": true },
-        { "ep": 2, "title": "Chacha Ji Ka Ghar", "description": "Chacha Ji aaye aur kahaani palat gayi.", "video_id": "HASI2", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "19 min", "is_free": true },
-        { "ep": 3, "title": "Biwi Ka Plan", "description": "Plan toh acha tha — galat sirf timing thi.", "video_id": "HASI3", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "21 min", "is_free": true }
+        { "ep":1, "title":"Shuruaat Ka Tamasha","description":"Pehle din se hi drama.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+1", "video_id":"HASI1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"22 min", "is_free":true },
+        { "ep":2, "title":"Chacha Ji Ka Ghar",  "description":"Chacha Ji aaye aur kahaani palat gayi.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+2", "video_id":"HASI2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"19 min", "is_free":true },
+        { "ep":3, "title":"Biwi Ka Plan",       "description":"Plan acha tha — galat sirf timing.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+3", "video_id":"HASI3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"21 min", "is_free":true }
       ]
     },
     {
       "id": "sach-ka-safar",
       "title": "Sach Ka Safar",
+      "poster_url": "https://placehold.co/300x533/001a1a/FFD700?text=Sach+Ka+Safar",
+      "banner_url": "https://placehold.co/480x270/001a1a/FFD700?text=Sach+Ka+Safar",
       "emoji": "🎙",
       "genre": "Podcast",
       "category": "podcast",
@@ -234,41 +162,27 @@
       "language": "Hindi",
       "year": "2026",
       "description": "True Crime podcast — woh cases jo kabhi solve nahi hue. Har episode ek naya raaz.",
-      "total_episodes": 42,
+      "total_episodes": 2,
       "gradient": "linear-gradient(135deg,#001a1a,#003333)",
-      "accent_emoji": "🎙",
       "cast": "Ravi Journalist",
       "episodes": [
-        { "ep": 1, "title": "Case 001: Gaaib Ladki", "description": "2019 mein ek ladki gaaib hui — police aaj bhi hairan hai.", "video_id": "SACH1", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "48 min", "is_free": true },
-        { "ep": 2, "title": "Case 002: Khoon Ka Letter", "description": "Ek khoon — aur ek letter jo baad mein mila.", "video_id": "SACH2", "video_url": "https://www.w3schools.com/html/mov_bbb.mp4", "duration": "52 min", "is_free": false }
+        { "ep":1, "title":"Case 001: Gaaib Ladki",   "description":"2019 mein ek ladki gaaib hui.", "thumbnail_url":"https://placehold.co/160x90/001a1a/FFD700?text=Ep+1", "video_id":"SACH1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"48 min", "is_free":true  },
+        { "ep":2, "title":"Case 002: Khoon Ka Letter","description":"Ek khoon — aur ek letter.", "thumbnail_url":"https://placehold.co/160x90/001a1a/FFD700?text=Ep+2", "video_id":"SACH2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"52 min", "is_free":false }
       ]
     }
   ],
 
-  "continue_watching_section": {
-    "enabled": true,
-    "title": "जारी रखें"
-  },
-
-  "featured_section": {
-    "title": "Trending Shows",
-    "show_ids": ["gungi", "dark-rajmahal", "zulmat-ki-raatein", "mohabbat-ka-andhera", "hasi-ke-rang"]
-  },
-
-  "new_releases_section": {
-    "title": "New Releases",
-    "show_ids": ["zulmat-ki-raatein", "hasi-ke-rang", "gungi", "mohabbat-ka-andhera"]
-  },
-
-  "podcast_section": {
-    "title": "Top Podcasts",
-    "show_ids": ["sach-ka-safar"]
+  "sections": {
+    "continue_watching": { "enabled": true,  "title": "जारी रखें" },
+    "featured":          { "title": "Trending Shows", "show_ids": ["gungi","dark-rajmahal","zulmat-ki-raatein","hasi-ke-rang","sach-ka-safar"] },
+    "new_releases":      { "title": "New Releases",   "show_ids": ["zulmat-ki-raatein","hasi-ke-rang","gungi","dark-rajmahal"] },
+    "podcasts":          { "title": "Top Podcasts",   "show_ids": ["sach-ka-safar"] }
   },
 
   "promo_banner": {
     "enabled": true,
     "title": "BTF GOLD Unlock करें",
-    "subtitle": "Ad-free + Exclusive Content + Downloads",
+    "subtitle": "Ad-free + Exclusive Content + Offline",
     "button_text": "₹49/mo →",
     "button_link": "#subscribe"
   }
