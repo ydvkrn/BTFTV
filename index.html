@@ -256,7 +256,7 @@ header{background:var(--bk);padding:14px 16px;display:flex;align-items:center;ju
 let D=null, history_=JSON.parse(localStorage.getItem('btftv_h')||'{}');
 
 async function load(){
-  try{const r=await fetch('./data.json');if(!r.ok)throw 0;D=await r.json();}
+  try{const r=await fetch('https://storytv.btfcompanystorage.workers.dev/data');if(!r.ok)throw 0;D=await r.json();}
   catch{D=null;document.body.innerHTML='<p style="color:#fff;padding:20px;font-family:sans-serif">⚠️ data.json not found. Place data.json in same folder.</p>';return;}
   init();
 }
