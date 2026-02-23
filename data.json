@@ -4,60 +4,267 @@
     "logo_text": "BTF",
     "logo_highlight": "TV",
     "tagline": "Your Story, Your World",
-    "favicon_url": "https://placehold.co/64x64/FFD700/000000?text=B",
+    "favicon_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
     "primary_color": "#FFD700",
     "accent_color": "#E8000A"
   },
 
-  "popup": {
-    "enabled": true,
-    "image_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
-    "title": "Crorepati Gareeb BTF GOLD Launch! 🌟",
-    "subtitle": "Pehle 30 din bilkul FREE — Ab subscribe karein!",
-    "button_text": "Abhi Claim Karein",
-    "button_link": "#subscribe",
-    "dismiss_text": "Baad Mein",
-    "show_once": false
-  },
+  "popups": [
+    {
+      "id": "popup_gold",
+      "enabled": true,
+      "show_once": true,
+      "delay_ms": 500,
+      "image_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "title": "Crorepati Gareeb BTF GOLD Launch! 🌟",
+      "subtitle": "Pehle 30 din bilkul FREE — Ab subscribe karein aur exclusive content enjoy karein!",
+      "button_text": "Abhi Claim Karein 🎉",
+      "button_link": "subscribe.html",
+      "dismiss_text": "Baad Mein",
+      "badge": "LIMITED OFFER",
+      "badge_color": "#E8000A"
+    },
+    {
+      "id": "popup_new_show",
+      "enabled": true,
+      "show_once": true,
+      "delay_ms": 0,
+      "image_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "title": "New Show Alert! 🔥",
+      "subtitle": "Crorepati Gareeb Season 1 ab available hai — pehla episode FREE mein dekho!",
+      "button_text": "Abhi Dekho",
+      "button_link": "show.html?id=c-greeb",
+      "dismiss_text": "Skip",
+      "badge": "NEW ARRIVAL",
+      "badge_color": "#1a7a1a"
+    },
+    {
+      "id": "popup_app",
+      "enabled": false,
+      "show_once": false,
+      "delay_ms": 0,
+      "image_url": "",
+      "title": "App Download Karein 📲",
+      "subtitle": "BTF TV App download karo aur offline bhi dekho!",
+      "button_text": "Download Now",
+      "button_link": "#download",
+      "dismiss_text": "Nahi Chahiye",
+      "badge": "FREE",
+      "badge_color": "#1a7a1a"
+    }
+  ],
 
-  "banner": {
-    "story_id": "dark-rajmahal",
-    "tag": "🔥 Trending",
-    "title": "Billionaire Driver",
-    "title_highlight": "Season 1",
-    "description": "Ek Billionaire Driver Jo Ji Rha Hai Naukaron Wali Life",
-    "image_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
-    "genre": "Drama • Thriller",
-    "rating": "18+",
-    "year": "2026",
-    "language": "Hindi"
-  },
+  "banners": [
+    {
+      "id": "banner_1",
+      "story_id": "c-greeb",
+      "tag": "🔥 HOT",
+      "tag_color": "#E8000A",
+      "title": "CROREPATI",
+      "title_highlight": "GAREEB",
+      "description": "Ek Billionaire Jo Ji Rha Hai Naukaron Wali Life",
+      "image_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "genre": "Thriller • Drama",
+      "rating": "9.1",
+      "year": "2026",
+      "language": "Hindi",
+      "gradient_overlay": "linear-gradient(to right, rgba(8,8,8,0.95) 30%, rgba(8,8,8,0.4) 70%, rgba(8,8,8,0.1) 100%)"
+    },
+    {
+      "id": "banner_2",
+      "story_id": "gungi",
+      "tag": "⭐ FEATURED",
+      "tag_color": "#FFD700",
+      "title": "BILLIONAIRE",
+      "title_highlight": "DRIVER",
+      "description": "Ek Ladki Jiske Paas Awaaz Nahi Lekin Dil Mein Tufaan Hai",
+      "image_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
+      "genre": "Drama • Romance",
+      "rating": "8.4",
+      "year": "2026",
+      "language": "Hindi",
+      "gradient_overlay": "linear-gradient(to right, rgba(8,8,8,0.95) 30%, rgba(8,8,8,0.4) 70%, rgba(8,8,8,0.1) 100%)"
+    },
+    {
+      "id": "banner_3",
+      "story_id": "randi",
+      "tag": "🆕 NEW",
+      "tag_color": "#1a9a1a",
+      "title": "RANDI",
+      "title_highlight": "RANI",
+      "description": "Ek Rani Jo Apni Zindagi Khud Likhti Hai",
+      "image_url": "https://img.freepik.com/free-photo/glamour-stylish-woman-model-summer-bright-cloth-street_158538-2361.jpg?semt=ais_hybrid&w=740",
+      "genre": "Drama",
+      "rating": "8.0",
+      "year": "2026",
+      "language": "Hindi",
+      "gradient_overlay": "linear-gradient(to right, rgba(8,8,8,0.95) 30%, rgba(8,8,8,0.4) 70%, rgba(8,8,8,0.1) 100%)"
+    }
+  ],
 
   "tabs": [
-    { "id": "all",       "label": "सभी",       "active": true },
-    { "id": "series",    "label": "Web Series" },
-    { "id": "podcast",   "label": "Podcasts"   },
-    { "id": "comedy",    "label": "Comedy"     },
-    { "id": "horror",    "label": "Horror"     },
-    { "id": "romance",   "label": "Romance"    }
+    { "id": "all",      "label": "सभी",       "icon": "fa-solid fa-house-chimney", "active": true },
+    { "id": "series",   "label": "Web Series", "icon": "fa-solid fa-film" },
+    { "id": "podcast",  "label": "Podcasts",   "icon": "fa-solid fa-microphone" },
+    { "id": "comedy",   "label": "Comedy",     "icon": "fa-solid fa-face-laugh-squint" },
+    { "id": "horror",   "label": "Horror",     "icon": "fa-solid fa-skull" },
+    { "id": "romance",  "label": "Romance",    "icon": "fa-solid fa-heart" },
+    { "id": "thriller", "label": "Thriller",   "icon": "fa-solid fa-bolt" }
   ],
 
   "categories": [
-    { "id": "horror",   "label": "Horror",   "emoji": "👻", "gradient": "linear-gradient(135deg,#1a0005,#5c001a)" },
-    { "id": "romance",  "label": "Romance",  "emoji": "💕", "gradient": "linear-gradient(135deg,#0a001a,#3d0066)" },
-    { "id": "drama",    "label": "Drama",    "emoji": "🎭", "gradient": "linear-gradient(135deg,#0f1a00,#2e5c00)" },
-    { "id": "thriller", "label": "Thriller", "emoji": "🔪", "gradient": "linear-gradient(135deg,#1a0500,#5c1a00)" },
-    { "id": "comedy",   "label": "Comedy",   "emoji": "😂", "gradient": "linear-gradient(135deg,#1a1500,#4d3d00)" },
-    { "id": "podcast",  "label": "Podcast",  "emoji": "🎙", "gradient": "linear-gradient(135deg,#001a1a,#004d4d)" }
+    {
+      "id": "horror",
+      "label": "Horror",
+      "icon": "fa-solid fa-skull-crossbones",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#1a0005,#5c001a)"
+    },
+    {
+      "id": "romance",
+      "label": "Romance",
+      "icon": "fa-solid fa-heart",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#0a001a,#3d0066)"
+    },
+    {
+      "id": "drama",
+      "label": "Drama",
+      "icon": "fa-solid fa-masks-theater",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#0f1a00,#2e5c00)"
+    },
+    {
+      "id": "thriller",
+      "label": "Thriller",
+      "icon": "fa-solid fa-bolt-lightning",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#1a0500,#5c1a00)"
+    },
+    {
+      "id": "comedy",
+      "label": "Comedy",
+      "icon": "fa-solid fa-face-laugh-wink",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#1a1500,#5c4d00)"
+    },
+    {
+      "id": "podcast",
+      "label": "Podcast",
+      "icon": "fa-solid fa-podcast",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#001a1a,#004d4d)"
+    },
+    {
+      "id": "action",
+      "label": "Action",
+      "icon": "fa-solid fa-fire-flame-curved",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#1a0000,#660000)"
+    },
+    {
+      "id": "fantasy",
+      "label": "Fantasy",
+      "icon": "fa-solid fa-wand-magic-sparkles",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#00001a,#000066)"
+    },
+    {
+      "id": "crime",
+      "label": "Crime",
+      "icon": "fa-solid fa-handcuffs",
+      "image_url": "",
+      "gradient": "linear-gradient(135deg,#0d0d0d,#2a2a2a)"
+    }
   ],
+
+  "promo_banners": [
+    {
+      "id": "promo_gold",
+      "enabled": true,
+      "type": "gradient",
+      "gradient": "linear-gradient(135deg,#B8860B,#FFD700,#B8860B)",
+      "text_color": "#000",
+      "icon": "fa-solid fa-crown",
+      "title": "BTF GOLD Unlock Karein",
+      "subtitle": "Ad-free + Exclusive Content + Offline Downloads",
+      "button_text": "₹49/mo →",
+      "button_link": "subscribe.html"
+    },
+    {
+      "id": "promo_refer",
+      "enabled": true,
+      "type": "gradient",
+      "gradient": "linear-gradient(135deg,#003d00,#00a300)",
+      "text_color": "#fff",
+      "icon": "fa-solid fa-share-nodes",
+      "title": "Dost Ko Refer Karein",
+      "subtitle": "Dono ko milega 7 din FREE GOLD access!",
+      "button_text": "Refer Now →",
+      "button_link": "#refer"
+    },
+    {
+      "id": "promo_app",
+      "enabled": false,
+      "type": "gradient",
+      "gradient": "linear-gradient(135deg,#00003d,#0000a3)",
+      "text_color": "#fff",
+      "icon": "fa-solid fa-mobile-screen",
+      "title": "BTF TV App Aaya!",
+      "subtitle": "Android aur iOS par download karein",
+      "button_text": "Download →",
+      "button_link": "#app"
+    }
+  ],
+
+  "sections": [
+    {
+      "id": "featured",
+      "type": "portrait",
+      "title": "Trending Shows",
+      "icon": "fa-solid fa-fire",
+      "show_ids": ["gungi", "c-greeb", "randi"],
+      "see_all_link": ""
+    },
+    {
+      "id": "new_releases",
+      "type": "landscape",
+      "title": "New Releases",
+      "icon": "fa-solid fa-star",
+      "show_ids": ["gungi", "c-greeb"],
+      "see_all_link": ""
+    },
+    {
+      "id": "top_picks",
+      "type": "portrait",
+      "title": "Top Picks For You",
+      "icon": "fa-solid fa-thumbs-up",
+      "show_ids": ["c-greeb", "randi", "gungi"],
+      "see_all_link": ""
+    },
+    {
+      "id": "podcasts",
+      "type": "landscape",
+      "title": "Top Podcasts",
+      "icon": "fa-solid fa-microphone-lines",
+      "show_ids": [],
+      "see_all_link": ""
+    }
+  ],
+
+  "continue_watching": {
+    "enabled": true,
+    "title": "Continue Watching",
+    "icon": "fa-solid fa-rotate-right"
+  },
 
   "shows": [
     {
       "id": "gungi",
       "title": "Billionaire Driver",
       "poster_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
-      "banner_url": "https://i.postimg.cc/mkDmSNsy/image.jpg",
-      "emoji": "🤫",
+      "banner_url": "https://img.freepik.com/free-photo/glamour-stylish-woman-model-summer-bright-cloth-street_158538-2361.jpg?semt=ais_hybrid&w=740",
+      "icon": "fa-solid fa-car",
       "genre": "Drama",
       "category": "drama",
       "badge": "NEW",
@@ -65,25 +272,40 @@
       "rating": "8.4",
       "language": "Hindi",
       "year": "2026",
-      "description": "Gungi ek aisi ladki ki kahani hai jo bol nahi sakti — lekin uski aankhein poori duniya ki zubaan bolti hain. Yeh sirf silence nahi, yeh ek revolt hai.",
+      "description": "Gungi ek aisi ladki ki kahani hai jo bol nahi sakti, lekin uski aankhein poori duniya se baat karti hain.",
       "total_episodes": 6,
       "gradient": "linear-gradient(135deg,#1a0a0a,#3d0000)",
       "cast": "Priya Sharma, Rahul Verma",
+      "tags": ["Drama", "Emotional", "Hindi"],
       "episodes": [
-        { "ep":1, "title":"Khamoshi Ka Arambh",  "description":"Gungi ka pehla din school mein — jahan words nahi, emotions bol uthte hain.", "thumbnail_url":"https://i.postimg.cc/mkDmSNsy/image.jpg", "video_id":"GUNGI1", "video_url":"https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlxc8jjvnmnmpf.mp4", "duration":"24 min", "is_free":true  },
-        { "ep":2, "title":"Ankhon Ki Zubaan",    "description":"Gungi ko pata chalta hai ki uska dost asli nahi tha.",                     "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+2", "video_id":"GUNGI2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"27 min", "is_free":true  },
-        { "ep":3, "title":"Toota Hua Sheeshe",   "description":"Ghar mein andhera chhaya hai — par Gungi ne apni awaaz dhundh li hai.",   "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+3", "video_id":"GUNGI3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"31 min", "is_free":false },
-        { "ep":4, "title":"Lahoo Ka Rang",        "description":"Sach saamne aata hai — aur Gungi ka dard aag ban jaata hai.",            "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+4", "video_id":"GUNGI4", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"29 min", "is_free":false },
-        { "ep":5, "title":"Judwa Chehra",         "description":"Dhoka ek baar aur — ab waqt hai uthne ka.",                              "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+5", "video_id":"GUNGI5", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"35 min", "is_free":false },
-        { "ep":6, "title":"Khamoshi Tooti",       "description":"Aakhri episode — Gungi ki pehli aur aakhri awaaz.",                      "thumbnail_url":"https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+6", "video_id":"GUNGI6", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"42 min", "is_free":false }
+        {
+          "ep": 1,
+          "title": "Khamoshi Ka Arambh",
+          "description": "Gungi ka pehla din school mein.",
+          "thumbnail_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlywca6kh14lbt.jpg",
+          "video_id": "GUNGI1",
+          "video_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlxc8jjvnmnmpf.mp4",
+          "duration": "24 min",
+          "is_free": true
+        },
+        {
+          "ep": 2,
+          "title": "Ankhon Ki Zubaan",
+          "description": "Gungi ko pata chalta hai.",
+          "thumbnail_url": "https://placehold.co/160x90/1a0a0a/ffffff?text=Ep+2",
+          "video_id": "GUNGI2",
+          "video_url": "https://www.w3schools.com/html/mov_bbb.mp4",
+          "duration": "27 min",
+          "is_free": true
+        }
       ]
     },
     {
-      "id": "dark-rajmahal",
-      "title": "Dark Rajmahal",
-      "poster_url": "https://placehold.co/300x533/1a0800/FFD700?text=Dark+Rajmahal",
-      "banner_url": "https://placehold.co/480x270/1a0800/FFD700?text=Dark+Rajmahal+S2",
-      "emoji": "👑",
+      "id": "c-greeb",
+      "title": "Crorepati Gareeb",
+      "poster_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "banner_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "icon": "fa-solid fa-money-bill-wave",
       "genre": "Thriller",
       "category": "thriller",
       "badge": "HOT",
@@ -91,99 +313,74 @@
       "rating": "9.1",
       "language": "Hindi",
       "year": "2026",
-      "description": "Rajmahal ke parde ke peeche chhupe raaz — pyaar, dhoka, aur khoon ki dastak. Ek royal thriller jo aapki neend uda dega.",
-      "total_episodes": 4,
+      "description": "Ek Crorepati Jo ji Rha Hai Gareb Bankar. Ek aisi kahani jo aapko sochne par majboor kar degi.",
+      "total_episodes": 3,
       "gradient": "linear-gradient(135deg,#1a0800,#3d2000)",
-      "cast": "Vikram Singh, Neha Kapoor",
+      "cast": "Riyaz Aly, Unknown",
+      "tags": ["Thriller", "Drama", "Hindi"],
       "episodes": [
-        { "ep":1, "title":"Taaj Ka Boj",       "description":"Rajmahal mein aate hi Arjun ko pehla raaz milta hai.", "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+1", "video_id":"RAJMAHAL1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"38 min", "is_free":true  },
-        { "ep":2, "title":"Khoon Ka Dhara",    "description":"Raat ke andheron mein ek laash milti hai.",           "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+2", "video_id":"RAJMAHAL2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"41 min", "is_free":true  },
-        { "ep":3, "title":"Woh Raat",          "description":"10 saal purani raat ka raaz khulne lagta hai.",       "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+3", "video_id":"RAJMAHAL3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"44 min", "is_free":false },
-        { "ep":4, "title":"Aaina Jhooth Bolta","description":"Rani ka asli chehra saamne aata hai.",               "thumbnail_url":"https://placehold.co/160x90/1a0800/FFD700?text=Ep+4", "video_id":"RAJMAHAL4", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"39 min", "is_free":false }
+        {
+          "ep": 1,
+          "title": "Waiter",
+          "description": "Crorepati Waiter Jo Nikla Naukari Se",
+          "thumbnail_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+          "video_id": "CGR1",
+          "video_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlyrmt2ahf9ady.mp4",
+          "duration": "2 min",
+          "is_free": true
+        },
+        {
+          "ep": 2,
+          "title": "Naukari ki Talaash",
+          "description": "Ek Crorepati Jo Dhundh Rha hai Naukari",
+          "thumbnail_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+          "video_id": "CGR2",
+          "video_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlyrmdbz67kunk.mp4",
+          "duration": "30 min",
+          "is_free": true
+        },
+        {
+          "ep": 3,
+          "title": "Love & War",
+          "description": "Pyaar aur jung ka sangam",
+          "thumbnail_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+          "video_id": "CGR3",
+          "video_url": "",
+          "duration": "2 min",
+          "is_free": false
+        }
       ]
     },
     {
-      "id": "zulmat-ki-raatein",
-      "title": "Zulmat Ki Raatein",
-      "poster_url": "https://placehold.co/300x533/0d0020/c0c0ff?text=Zulmat",
-      "banner_url": "https://placehold.co/480x270/0d0020/c0c0ff?text=Zulmat+Ki+Raatein",
-      "emoji": "🌑",
-      "genre": "Horror",
-      "category": "horror",
+      "id": "randi",
+      "title": "Randi Rani",
+      "icon": "fa-solid fa-crown",
+      "genre": "Drama",
+      "category": "drama",
       "badge": "NEW",
       "badge_type": "new",
-      "rating": "8.7",
+      "rating": "8.0",
       "language": "Hindi",
       "year": "2026",
-      "description": "Ek haunted haveli, teen dost, aur ek curse jo 100 saal se jagta aa raha hai. Darr guarantee hai.",
-      "total_episodes": 3,
-      "gradient": "linear-gradient(135deg,#0d0020,#1a0030)",
-      "cast": "Ananya Roy, Dev Sharma",
+      "description": "Ek Rani Jo Apni Zindagi Ki Khud Maalik Hai",
+      "poster_url": "https://img.freepik.com/free-photo/glamour-stylish-woman-model-summer-bright-cloth-street_158538-2361.jpg?semt=ais_hybrid&w=740",
+      "banner_url": "https://img.freepik.com/free-photo/glamour-stylish-woman-model-summer-bright-cloth-street_158538-2361.jpg?semt=ais_hybrid&w=740",
+      "gradient": "linear-gradient(135deg,#1a0a0a,#3d0000)",
+      "cast": "Nupur Sharma",
+      "tags": ["Drama", "Bold", "Hindi"],
+      "total_episodes": 1,
       "episodes": [
-        { "ep":1, "title":"Aahat",         "description":"Pehli raat — pehli awaaz.", "thumbnail_url":"https://placehold.co/160x90/0d0020/ffffff?text=Ep+1", "video_id":"ZULMAT1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"32 min", "is_free":true  },
-        { "ep":2, "title":"Deewar Ka Saaya","description":"Deewar par khoon ke nishaan.", "thumbnail_url":"https://placehold.co/160x90/0d0020/ffffff?text=Ep+2", "video_id":"ZULMAT2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"28 min", "is_free":true  },
-        { "ep":3, "title":"Buri Aatma",    "description":"Teesra dost gaaib ho jaata hai.", "thumbnail_url":"https://placehold.co/160x90/0d0020/ffffff?text=Ep+3", "video_id":"ZULMAT3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"35 min", "is_free":false }
-      ]
-    },
-    {
-      "id": "hasi-ke-rang",
-      "title": "Gareeb Crorepati",
-      "poster_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
-      "banner_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
-      "emoji": "❤️‍🔥",
-      "genre": "Comedy",
-      "category": "comedy",
-      "badge": "FREE",
-      "badge_type": "free",
-      "rating": "7.8",
-      "language": "Hindi",
-      "year": "2026",
-      "description": "Ek family comedy jo hasaate hasaate aansu de jaayegi — pyaar, pagalpan aur poori nautanki!",
-      "total_episodes": 3,
-      "gradient": "linear-gradient(135deg,#1a1500,#4d3d00)",
-      "cast": "Comedy Team BTF",
-      "episodes": [
-        { "ep":1, "title":"Shuruaat Ka Tamasha","description":"Pehle din se hi drama.", "thumbnail_url":"https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg", "video_id":"HASI1", "video_url":"https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlyrmt2ahf9ady.mp4", "duration":"22 min", "is_free":true },
-        { "ep":2, "title":"Chacha Ji Ka Ghar",  "description":"Chacha Ji aaye aur kahaani palat gayi.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+2", "video_id":"HASI2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"19 min", "is_free":true },
-        { "ep":3, "title":"Biwi Ka Plan",       "description":"Plan acha tha — galat sirf timing.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+3", "video_id":"HASI3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"21 min", "is_free":true }
-      ]
-    },
-    {
-      "id": "sach-ka-safar",
-      "title": "Sach Ka Safar",
-      "poster_url": "https://placehold.co/300x533/001a1a/FFD700?text=Sach+Ka+Safar",
-      "banner_url": "https://placehold.co/480x270/001a1a/FFD700?text=Sach+Ka+Safar",
-      "emoji": "🎙",
-      "genre": "Podcast",
-      "category": "podcast",
-      "badge": "GOLD",
-      "badge_type": "premium",
-      "rating": "9.3",
-      "language": "Hindi",
-      "year": "2026",
-      "description": "True Crime podcast — woh cases jo kabhi solve nahi hue. Har episode ek naya raaz.",
-      "total_episodes": 2,
-      "gradient": "linear-gradient(135deg,#001a1a,#003333)",
-      "cast": "Ravi Journalist",
-      "episodes": [
-        { "ep":1, "title":"Case 001: Gaaib Ladki",   "description":"2019 mein ek ladki gaaib hui.", "thumbnail_url":"https://placehold.co/160x90/001a1a/FFD700?text=Ep+1", "video_id":"SACH1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"48 min", "is_free":true  },
-        { "ep":2, "title":"Case 002: Khoon Ka Letter","description":"Ek khoon — aur ek letter.", "thumbnail_url":"https://placehold.co/160x90/001a1a/FFD700?text=Ep+2", "video_id":"SACH2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"52 min", "is_free":false }
+        {
+          "ep": 1,
+          "title": "New Episode",
+          "description": "Pehla qadam",
+          "thumbnail_url": "",
+          "video_id": "EP1771832227400",
+          "video_url": "",
+          "duration": "30 min",
+          "is_free": true
+        }
       ]
     }
-  ],
-
-  "sections": {
-    "continue_watching": { "enabled": true,  "title": "जारी रखें" },
-    "featured":          { "title": "Trending Shows", "show_ids": ["gungi","dark-rajmahal","zulmat-ki-raatein","hasi-ke-rang","sach-ka-safar"] },
-    "new_releases":      { "title": "New Releases",   "show_ids": ["zulmat-ki-raatein","hasi-ke-rang","gungi","dark-rajmahal"] },
-    "podcasts":          { "title": "Top Podcasts",   "show_ids": ["sach-ka-safar"] }
-  },
-
-  "promo_banner": {
-    "enabled": true,
-    "title": "BTF GOLD Unlock करें",
-    "subtitle": "Ad-free + Exclusive Content + Offline",
-    "button_text": "₹49/mo →",
-    "button_link": "#subscribe"
-  }
+  ]
 }
