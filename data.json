@@ -11,8 +11,8 @@
 
   "popup": {
     "enabled": true,
-    "image_url": "https://placehold.co/420x220/1a0a0a/FFD700?text=BTF+GOLD+Launch",
-    "title": "BTF GOLD Launch! 🌟",
+    "image_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+    "title": "Crorepati Gareeb BTF GOLD Launch! 🌟",
     "subtitle": "Pehle 30 din bilkul FREE — Ab subscribe karein!",
     "button_text": "Abhi Claim Karein",
     "button_link": "#subscribe",
@@ -127,10 +127,10 @@
     },
     {
       "id": "hasi-ke-rang",
-      "title": "Hasi Ke Rang",
-      "poster_url": "https://placehold.co/300x533/1a1500/ffffff?text=Hasi+Ke+Rang",
-      "banner_url": "https://placehold.co/480x270/1a1500/FFD700?text=Hasi+Ke+Rang",
-      "emoji": "😂",
+      "title": "Gareeb Crorepati",
+      "poster_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "banner_url": "https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg",
+      "emoji": "❤️‍🔥",
       "genre": "Comedy",
       "category": "comedy",
       "badge": "FREE",
@@ -143,7 +143,7 @@
       "gradient": "linear-gradient(135deg,#1a1500,#4d3d00)",
       "cast": "Comedy Team BTF",
       "episodes": [
-        { "ep":1, "title":"Shuruaat Ka Tamasha","description":"Pehle din se hi drama.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+1", "video_id":"HASI1", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"22 min", "is_free":true },
+        { "ep":1, "title":"Shuruaat Ka Tamasha","description":"Pehle din se hi drama.", "thumbnail_url":"https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlys25g2ujx2ze.jpg", "video_id":"HASI1", "video_url":"https://fast.btfcompanystorage.workers.dev/btfstorage/file/idmlyrmt2ahf9ady.mp4", "duration":"22 min", "is_free":true },
         { "ep":2, "title":"Chacha Ji Ka Ghar",  "description":"Chacha Ji aaye aur kahaani palat gayi.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+2", "video_id":"HASI2", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"19 min", "is_free":true },
         { "ep":3, "title":"Biwi Ka Plan",       "description":"Plan acha tha — galat sirf timing.", "thumbnail_url":"https://placehold.co/160x90/1a1500/FFD700?text=Ep+3", "video_id":"HASI3", "video_url":"https://www.w3schools.com/html/mov_bbb.mp4", "duration":"21 min", "is_free":true }
       ]
