@@ -119,7 +119,7 @@ const params=new URLSearchParams(location.search);
 const sid=params.get('id');
 
 async function load(){
-  try{const r=await fetch('./data.json');if(!r.ok)throw 0;D=await r.json();}
+  try{const r=await fetch('https://storytv.btfcompanystorage.workers.dev/data');if(!r.ok)throw 0;D=await r.json();}
   catch{document.getElementById('loading').innerHTML='<p style="color:#fff;padding:20px">⚠️ data.json not found</p>';return;}
   show=D.shows.find(s=>s.id===sid);
   if(!show){document.getElementById('loading').innerHTML='<p style="color:#fff;padding:20px">Show not found</p>';return;}
