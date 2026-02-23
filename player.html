@@ -306,7 +306,7 @@ const upEpTitle=document.getElementById('up-ep-title');
 
 // ── LOAD DATA ─────────────────────────────────────────────
 async function load(){
-  try{const r=await fetch('./data.json');if(!r.ok)throw 0;D=await r.json();}
+  try{const r=await fetch('https://storytv.btfcompanystorage.workers.dev/data');if(!r.ok)throw 0;D=await r.json();}
   catch{showError('data.json load failed');return;}
   show=D.shows.find(s=>s.id===sid);
   if(!show){showError('Show not found');return;}
