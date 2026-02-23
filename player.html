@@ -6,6 +6,8 @@
 <title>BTF TV – Player</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Font Awesome 6 (free) for all icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <!-- SECURITY: Prevent any right-click, selection, drag -->
 <style>
@@ -42,28 +44,19 @@ body{font-family:'Poppins',sans-serif;background:var(--bk);color:var(--wh);max-w
   padding-top:56.25%;
   background:#000;
   overflow:hidden;
-  /* Block screenshot/screen-record hints (CSS only) */
   -webkit-touch-callout:none;
 }
-
-/* INVISIBLE OVERLAY — blocks right-click & long-press on video */
-#vid-block{
-  position:absolute;inset:0;z-index:10;
-  background:transparent;
-  pointer-events:none; /* Will be set to 'all' after JS loads */
+#vid-wrap.fullscreen{
+  position:fixed;top:0;left:0;width:100%;height:100%;padding-top:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;background:#000;
+}
+#vid-wrap.fullscreen video{
+  width:100%;height:100%;object-fit:contain;
 }
 
-/* The actual video — completely hidden native controls */
-#vid{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:contain;
-  background:#000;
-  display:block;
-  /* Remove ALL native controls */
-  pointer-events:none;
-}
-/* Hide ALL native browser media controls */
+/* INVISIBLE OVERLAY */
+#vid-block{position:absolute;inset:0;z-index:10;background:transparent;pointer-events:none;}
+#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;pointer-events:none;}
 video::-webkit-media-controls{display:none!important;}
 video::-webkit-media-controls-enclosure{display:none!important;}
 video::-webkit-media-controls-panel{display:none!important;}
@@ -71,35 +64,17 @@ video::--webkit-media-controls{display:none!important;}
 video::-moz-range-thumb{display:none!important;}
 
 /* BUFFER BAR */
-#buf{
-  position:absolute;bottom:52px;left:0;right:0;height:2px;
-  background:rgba(255,255,255,.1);z-index:12;
-}
+#buf{position:absolute;bottom:52px;left:0;right:0;height:2px;background:rgba(255,255,255,.1);z-index:12;}
 #buf-fill{height:100%;background:rgba(255,255,255,.2);width:0;transition:width .3s;}
 
 /* CUSTOM PROGRESS */
-#prog-wrap{
-  position:absolute;bottom:42px;left:0;right:0;z-index:12;
-  padding:6px 0;cursor:pointer;
-}
-#prog-track{
-  width:100%;height:3px;background:rgba(255,255,255,.15);
-  position:relative;transition:height .2s;
-}
+#prog-wrap{position:absolute;bottom:42px;left:0;right:0;z-index:12;padding:6px 0;cursor:pointer;}
+#prog-track{width:100%;height:3px;background:rgba(255,255,255,.15);position:relative;transition:height .2s;}
 #prog-wrap:hover #prog-track{height:5px;}
 #prog-fill{height:100%;background:var(--g);width:0%;border-radius:2px;pointer-events:none;transition:width .05s linear;}
-#prog-thumb{
-  width:14px;height:14px;background:var(--g);border-radius:50%;
-  position:absolute;top:50%;transform:translate(-50%,-50%);
-  left:0%;display:none;box-shadow:0 0 6px rgba(255,215,0,.5);
-}
+#prog-thumb{width:14px;height:14px;background:var(--g);border-radius:50%;position:absolute;top:50%;transform:translate(-50%,-50%);left:0%;display:none;box-shadow:0 0 6px rgba(255,215,0,.5);}
 #prog-wrap:hover #prog-thumb{display:block;}
-#prog-time{
-  position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.85);color:var(--wh);font-size:.65rem;
-  padding:2px 8px;border-radius:4px;white-space:nowrap;
-  opacity:0;transition:opacity .2s;pointer-events:none;margin-bottom:6px;
-}
+#prog-time{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:var(--wh);font-size:.65rem;padding:2px 8px;border-radius:4px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;margin-bottom:6px;}
 #prog-wrap:hover #prog-time{opacity:1;}
 
 /* MAIN CONTROLS */
@@ -108,19 +83,22 @@ video::-moz-range-thumb{display:none!important;}
   background:linear-gradient(to top,rgba(0,0,0,.9) 0%,transparent 100%);
   display:flex;align-items:center;justify-content:space-between;
   padding:8px 14px 10px;z-index:15;
-  height:44px;
+  height:48px; /* slightly taller */
 }
+.ctrl-time{font-size:.75rem;color:rgba(255,255,255,.9);font-weight:600;letter-spacing:.3px;}
+.ctrl-btn{
+  background:none;border:none;color:var(--wh);font-size:1.4rem;cursor:pointer;padding:0 8px;
+  display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;
+}
+.ctrl-btn:active{color:var(--g);}
+.ctrl-btn:disabled{opacity:.2;cursor:not-allowed;}
 
-/* SKIP BUTTONS */
+/* SKIP BUTTONS (10s) */
 .skip-btn{
   position:absolute;top:50%;transform:translateY(-50%);z-index:14;
-  background:rgba(0,0,0,.35);
-  border:none;color:var(--wh);
-  width:52px;height:52px;border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;gap:1px;
-  opacity:0;transition:opacity .2s;
-  -webkit-backdrop-filter:blur(4px);
+  background:rgba(0,0,0,.35);border:none;color:var(--wh);
+  width:56px;height:56px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;
+  opacity:0;transition:opacity .2s;backdrop-filter:blur(4px);
 }
 .skip-btn span{font-size:.5rem;font-weight:700;color:rgba(255,255,255,.8);}
 #skip-b{left:calc(50% - 90px);}
@@ -131,48 +109,40 @@ video::-moz-range-thumb{display:none!important;}
 /* PLAY/PAUSE CENTER BTN */
 #play-btn{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:14;
-  width:58px;height:58px;background:rgba(255,215,0,.9);border-radius:50%;
-  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;box-shadow:0 0 20px rgba(255,215,0,.35);
-  opacity:0;transition:opacity .2s;
-  backdrop-filter:blur(4px);
+  width:64px;height:64px;background:rgba(255,215,0,.9);border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 0 20px rgba(255,215,0,.35);
+  opacity:0;transition:opacity .2s;backdrop-filter:blur(4px);
 }
 #vid-wrap.ctrl-vis #play-btn{opacity:1;}
 
-/* TIME DISPLAY */
-.ctrl-time{font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600;letter-spacing:.3px;}
-
-/* EPISODE NAV ARROWS */
-.ep-arrow{
-  background:none;border:none;color:rgba(255,255,255,.6);
-  font-size:1.4rem;cursor:pointer;padding:4px 8px;transition:color .2s;
-}
-.ep-arrow:active{color:var(--g);}
-.ep-arrow:disabled{opacity:.2;cursor:not-allowed;}
-
-/* SPINNER WHILE LOADING */
-#spinner{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:13;
-  display:none;
-}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
-#spinner.on{display:block;animation:spin .8s linear infinite;}
-.spin-ring{
-  width:44px;height:44px;border:3px solid rgba(255,255,255,.1);
-  border-top-color:var(--g);border-radius:50%;
-}
-
 /* DOUBLE TAP FLASH */
 .dt-flash{
-  position:absolute;top:0;bottom:0;width:45%;
-  background:rgba(255,215,0,.12);border-radius:4px;
-  opacity:0;z-index:16;pointer-events:none;transition:opacity .15s;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--g);letter-spacing:.5px;
+  position:absolute;top:0;bottom:0;width:45%;background:rgba(255,215,0,.12);border-radius:4px;
+  opacity:0;z-index:16;pointer-events:none;transition:opacity .15s;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--g);letter-spacing:.5px;
 }
 #dt-left{left:0;border-radius:0 50% 50% 0;}
 #dt-right{right:0;border-radius:50% 0 0 50%;}
 .dt-flash.on{opacity:1;}
+
+/* UP NEXT OVERLAY (appears when video ends) */
+#up-next{
+  position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  opacity:0;transition:opacity .3s;
+}
+#up-next.show{display:flex;opacity:1;}
+.up-title{font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--g);}
+.up-ep{font-size:1.1rem;color:var(--wh);margin-bottom:8px;}
+.up-actions{display:flex;gap:30px;}
+.up-btn{background:var(--b3);border:none;color:var(--wh);font-size:1.2rem;padding:12px 25px;border-radius:40px;cursor:pointer;font-weight:600;border:1px solid var(--b4);}
+.up-btn:active{background:var(--g);color:var(--bk);}
+.up-btn i{margin-right:8px;}
+
+/* SPINNER */
+#spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:13;display:none;}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+#spinner.on{display:block;animation:spin .8s linear infinite;}
+.spin-ring{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--g);border-radius:50%;}
 
 /* INFO SECTION */
 .info-sec{padding:14px 16px 8px;}
@@ -194,7 +164,7 @@ video::-moz-range-thumb{display:none!important;}
 .ne-inf{flex:1;min-width:0;}
 .ne-tit{font-size:.8rem;font-weight:600;color:var(--wh);}
 .ne-meta{font-size:.66rem;color:var(--gr);margin-top:3px;}
-.ne-lock{margin-left:auto;font-size:.9rem;}
+.ne-lock{margin-left:auto;font-size:.9rem;color:var(--g);}
 
 /* TOAST */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--b3);color:var(--wh);border:1px solid var(--b4);padding:10px 20px;border-radius:30px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
@@ -210,7 +180,7 @@ video::-moz-range-thumb{display:none!important;}
 
 <!-- TOP BAR -->
 <div class="tbar">
-  <button class="bk" id="back-btn">←</button>
+  <button class="bk" id="back-btn"><i class="fas fa-arrow-left"></i></button>
   <div class="bar-t" id="bar-t">Loading...</div>
   <div class="bar-id" id="bar-id"></div>
 </div>
@@ -221,13 +191,13 @@ video::-moz-range-thumb{display:none!important;}
   <div id="vid-block"></div>
 
   <!-- Double tap flash indicators -->
-  <div class="dt-flash" id="dt-left">◀◀ 10s</div>
-  <div class="dt-flash" id="dt-right">10s ▶▶</div>
+  <div class="dt-flash" id="dt-left"><i class="fas fa-backward"></i> 10s</div>
+  <div class="dt-flash" id="dt-right">10s <i class="fas fa-forward"></i></div>
 
   <!-- Spinner -->
   <div id="spinner"><div class="spin-ring"></div></div>
 
-  <!-- Actual Video element — NO SRC set here, set via JS -->
+  <!-- Actual Video element -->
   <video id="vid"
     playsinline
     preload="metadata"
@@ -248,23 +218,34 @@ video::-moz-range-thumb{display:none!important;}
     <div id="prog-time">0:00</div>
   </div>
 
-  <!-- Skip buttons -->
+  <!-- Skip buttons (10s) -->
   <button class="skip-btn" id="skip-b" onclick="skip(-10)">
-    <span class="skip-ico">↺</span><span>10s</span>
+    <i class="fas fa-undo-alt skip-ico"></i><span>10s</span>
   </button>
   <button class="skip-btn" id="skip-f" onclick="skip(10)">
-    <span class="skip-ico">↻</span><span>10s</span>
+    <i class="fas fa-redo-alt skip-ico"></i><span>10s</span>
   </button>
 
   <!-- Play / Pause center -->
-  <button id="play-btn" onclick="togglePlay()">▶</button>
+  <button id="play-btn" onclick="togglePlay()"><i class="fas fa-play"></i></button>
+
+  <!-- Up Next Overlay -->
+  <div id="up-next">
+    <div class="up-title">अगला एपिसोड</div>
+    <div class="up-ep" id="up-ep-title">Ep 2: Title</div>
+    <div class="up-actions">
+      <button class="up-btn" id="up-cancel"><i class="fas fa-times"></i> रद्द करें</button>
+      <button class="up-btn" id="up-go"><i class="fas fa-step-forward"></i> अभी देखें</button>
+    </div>
+  </div>
 
   <!-- Controls bar -->
   <div id="ctrl">
     <span class="ctrl-time" id="t-cur">0:00</span>
-    <button class="ep-arrow" id="ep-prev" onclick="prevEp()">⏮</button>
-    <button class="ep-arrow" id="ep-next" onclick="nextEp()">⏭</button>
+    <button class="ctrl-btn" id="ep-prev" onclick="prevEp()"><i class="fas fa-step-backward"></i></button>
+    <button class="ctrl-btn" id="ep-next" onclick="nextEp()"><i class="fas fa-step-forward"></i></button>
     <span class="ctrl-time" id="t-dur">--:--</span>
+    <button class="ctrl-btn" id="fullscreen-btn" onclick="toggleFullscreen()"><i class="fas fa-expand"></i></button>
   </div>
 </div>
 
@@ -289,20 +270,15 @@ video::-moz-range-thumb{display:none!important;}
 'use strict';
 
 // ── SECURITY LAYER ──────────────────────────────────────
-// Block right-click everywhere
 document.addEventListener('contextmenu',e=>e.preventDefault(),true);
-// Block keyboard shortcuts that reveal source
 document.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if((e.ctrlKey||e.metaKey)&&['s','u','a','c','j','i','p'].includes(k)){e.preventDefault();e.stopPropagation();}
   if(e.key==='F12'||e.key==='PrintScreen'){e.preventDefault();}
 },true);
-// Block drag-drop
 document.addEventListener('dragstart',e=>e.preventDefault(),true);
 document.addEventListener('drop',e=>e.preventDefault(),true);
-// Block text selection
 document.addEventListener('selectstart',e=>e.preventDefault(),true);
-// Block touch long-press context menu
 document.addEventListener('touchstart',e=>{if(e.target.tagName==='VIDEO')e.preventDefault();},{passive:false});
 
 // ── STATE ────────────────────────────────────────────────
@@ -325,6 +301,8 @@ const tDur=document.getElementById('t-dur');
 const spinner=document.getElementById('spinner');
 const dtLeft=document.getElementById('dt-left');
 const dtRight=document.getElementById('dt-right');
+const upNext=document.getElementById('up-next');
+const upEpTitle=document.getElementById('up-ep-title');
 
 // ── LOAD DATA ─────────────────────────────────────────────
 async function load(){
@@ -335,7 +313,6 @@ async function load(){
   setFavicon();
   setupSecurity();
   loadEpisode(epIdx);
-  // After short delay, hide loader
   setTimeout(()=>{document.getElementById('ld').classList.add('off');},800);
 }
 
@@ -351,16 +328,13 @@ function loadEpisode(idx){
   if(!ep)return;
   epIdx=idx;
 
-  // Update URL without reload
   const newUrl=location.pathname+'?sid='+sid+'&ei='+idx;
   history.replaceState(null,'',newUrl);
 
-  // Revoke previous blob URL
   if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}
 
-  // Update UI info
   document.getElementById('bar-t').textContent='Ep '+ep.ep+' · '+ep.title;
-  document.getElementById('bar-id').textContent=''; // DO NOT show video ID in visible UI
+  document.getElementById('bar-id').textContent='';
   document.getElementById('sh-name').textContent=show.title+' · '+show.genre;
   document.getElementById('ep-title').textContent=ep.title;
   document.getElementById('ep-meta').textContent=
@@ -368,17 +342,12 @@ function loadEpisode(idx){
   document.getElementById('ep-desc').textContent=ep.description;
   document.title='Ep '+ep.ep+' – '+show.title+' | '+D.site.name;
 
-  // Nav buttons
   document.getElementById('ep-prev').disabled=idx===0;
   document.getElementById('ep-next').disabled=idx===show.episodes.length-1;
 
-  // Load video via blob URL (masks actual URL from network tab display)
   loadVideoSecure(ep.video_url);
-
-  // Render next episodes
   renderNext(idx);
 
-  // Restore watch position if exists
   const key=sid+'_'+idx;
   const savedTime=history_[key]?.t||0;
   if(savedTime>3){
@@ -387,10 +356,14 @@ function loadEpisode(idx){
       vid.removeEventListener('canplay',once);
     });
   }
+
+  // Update play button icon (reset)
+  playBtn.innerHTML=vid.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+  // Hide up-next if visible
+  upNext.classList.remove('show');
 }
 
 // ── SECURE VIDEO LOAD ─────────────────────────────────────
-// Fetches video and plays via blob URL so actual URL is NOT in src attribute
 async function loadVideoSecure(url){
   spinner.classList.add('on');
   vid.src='';
@@ -402,18 +375,23 @@ async function loadVideoSecure(url){
     vid.src=blobUrl;
     vid.load();
   } catch(e){
-    // Fallback: if CORS blocks blob approach, use direct src
-    // URL still won't be obvious in DOM
+    toast('वीडियो लोड नहीं हुआ, डायरेक्ट लिंक कोशिश कर रहा है...');
     vid.src=url;
     vid.load();
+  } finally{
+    spinner.classList.remove('on');
   }
-  spinner.classList.remove('on');
 }
 
 // ── PLAYBACK CONTROLS ─────────────────────────────────────
 function togglePlay(){
-  if(vid.paused){vid.play().catch(()=>{});playBtn.textContent='⏸';}
-  else{vid.pause();playBtn.textContent='▶';}
+  if(vid.paused){
+    vid.play().catch(()=>{});
+    playBtn.innerHTML='<i class="fas fa-pause"></i>';
+  }else{
+    vid.pause();
+    playBtn.innerHTML='<i class="fas fa-play"></i>';
+  }
   showCtrl();
 }
 
@@ -434,6 +412,25 @@ function nextEp(){
   }
 }
 
+// ── FULLSCREEN TOGGLE ─────────────────────────────────────
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    vidWrap.requestFullscreen().catch(err=>toast('Fullscreen नहीं हुआ'));
+  }else{
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const fsBtn=document.getElementById('fullscreen-btn').querySelector('i');
+  if(document.fullscreenElement){
+    vidWrap.classList.add('fullscreen');
+    fsBtn.className='fas fa-compress';
+  }else{
+    vidWrap.classList.remove('fullscreen');
+    fsBtn.className='fas fa-expand';
+  }
+});
+
 // ── CONTROLS VISIBILITY ───────────────────────────────────
 function showCtrl(){
   vidWrap.classList.add('ctrl-vis');
@@ -441,7 +438,8 @@ function showCtrl(){
   if(!vid.paused){ctrlTimer=setTimeout(()=>vidWrap.classList.remove('ctrl-vis'),3000);}
 }
 
-vidWrap.addEventListener('click',()=>{
+vidWrap.addEventListener('click',(e)=>{
+  if(e.target.closest('button')||e.target===progWrap) return; // ignore buttons
   if(vidWrap.classList.contains('ctrl-vis')){
     if(!vid.paused){vidWrap.classList.remove('ctrl-vis');}
   } else {
@@ -450,8 +448,8 @@ vidWrap.addEventListener('click',()=>{
 });
 
 // ── VIDEO EVENTS ──────────────────────────────────────────
-vid.addEventListener('play',()=>{playBtn.textContent='⏸';showCtrl();});
-vid.addEventListener('pause',()=>{playBtn.textContent='▶';showCtrl();});
+vid.addEventListener('play',()=>{playBtn.innerHTML='<i class="fas fa-pause"></i>';showCtrl();});
+vid.addEventListener('pause',()=>{playBtn.innerHTML='<i class="fas fa-play"></i>';showCtrl();});
 vid.addEventListener('waiting',()=>spinner.classList.add('on'));
 vid.addEventListener('canplay',()=>spinner.classList.remove('on'));
 vid.addEventListener('loadedmetadata',()=>{
@@ -465,18 +463,38 @@ vid.addEventListener('timeupdate',()=>{
     tCur.textContent=fmt(vid.currentTime);
     saveProgress();
   }
-  // Buffer
   if(vid.buffered.length>0){
     const bpct=(vid.buffered.end(vid.buffered.length-1)/vid.duration)*100;
     bufFill.style.width=bpct+'%';
   }
 });
 vid.addEventListener('ended',()=>{
-  playBtn.textContent='▶';
+  playBtn.innerHTML='<i class="fas fa-play"></i>';
   vidWrap.classList.add('ctrl-vis');
+  // Show up-next if there is a next episode (free or not, but we'll check)
   if(epIdx<show.episodes.length-1){
     const next=show.episodes[epIdx+1];
-    if(next?.is_free)setTimeout(()=>loadEpisode(epIdx+1),2000);
+    upEpTitle.textContent = `Ep ${next.ep}: ${next.title}`;
+    upNext.classList.add('show');
+    // Auto-go after 10 seconds (cancelable)
+    upNext.dataset.timeout = setTimeout(()=>{
+      if(upNext.classList.contains('show')){
+        if(next.is_free) loadEpisode(epIdx+1);
+        else { toast('🔒 अगला एपिसोड GOLD है'); upNext.classList.remove('show'); }
+      }
+    },10000);
+  }
+});
+document.getElementById('up-cancel').addEventListener('click',()=>{
+  clearTimeout(upNext.dataset.timeout);
+  upNext.classList.remove('show');
+});
+document.getElementById('up-go').addEventListener('click',()=>{
+  clearTimeout(upNext.dataset.timeout);
+  if(epIdx<show.episodes.length-1){
+    const next=show.episodes[epIdx+1];
+    if(!next.is_free){toast('🔒 GOLD required'); upNext.classList.remove('show'); return;}
+    loadEpisode(epIdx+1);
   }
 });
 
@@ -518,19 +536,16 @@ progWrap.addEventListener('mousemove',e=>{
 // ── DOUBLE TAP TO SKIP ────────────────────────────────────
 let tapTimer=null, lastTap=0;
 vidWrap.addEventListener('touchend',e=>{
-  if(e.target.closest('button')||e.target===document.getElementById('prog-wrap'))return;
+  if(e.target.closest('button')||e.target===progWrap)return;
   const now=Date.now();
   const rect=vidWrap.getBoundingClientRect();
   const tx=e.changedTouches[0].clientX;
   const isLeft=tx<rect.left+rect.width/2;
   if(now-lastTap<300){
-    // Double tap
     clearTimeout(tapTimer);
     skip(isLeft?-10:10);
   } else {
-    tapTimer=setTimeout(()=>{
-      showCtrl();
-    },300);
+    tapTimer=setTimeout(()=>{showCtrl();},300);
   }
   lastTap=now;
 });
@@ -555,17 +570,19 @@ function renderNext(curIdx){
   if(!nexts.length){list.innerHTML='<p style="color:var(--gr);font-size:.8rem">कोई अगला episode नहीं।</p>';return;}
   list.innerHTML=nexts.map((ep,i)=>{
     const ni=curIdx+1+i;
-    return`<div class="nepc ${ep.is_free?'':'locked'}" onclick="nxtEpCk(${ni})">
+    const lockedClass = ep.is_free ? '' : 'locked';
+    const lockIcon = ep.is_free ? '' : '<i class="fas fa-lock ne-lock"></i>';
+    return`<div class="nepc ${lockedClass}" onclick="nxtEpCk(${ni})">
       <div class="ne-num">${ep.ep}</div>
       <div class="ne-th" style="background:${show.gradient}">
-        <img src="${ep.thumbnail_url||''}" alt="" onerror="this.style.display='none'">
-        ${show.emoji}
+        ${ep.thumbnail_url ? `<img src="${ep.thumbnail_url}" alt="" onerror="this.style.display='none'">` : ''}
+        <i class="fas fa-film" style="font-size:2rem; color:rgba(255,255,255,0.7);"></i>
       </div>
       <div class="ne-inf">
         <div class="ne-tit">${ep.title}</div>
-        <div class="ne-meta">⏱ ${ep.duration}${ep.is_free?' · FREE':' · 🔒 GOLD'}</div>
+        <div class="ne-meta">⏱ ${ep.duration}${ep.is_free ? ' · <i class="fas fa-lock-open" style="color:var(--g);"></i> FREE' : ''}</div>
       </div>
-      ${ep.is_free?'':'<span class="ne-lock">🔒</span>'}
+      ${lockIcon}
     </div>`;
   }).join('');
 }
@@ -584,7 +601,6 @@ function setupSecurity(){
   block.style.pointerEvents='all';
   block.addEventListener('contextmenu',e=>e.preventDefault(),true);
   block.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
-  // DO NOT intercept click — we handle play/pause separately
   block.style.cursor='default';
 }
 
