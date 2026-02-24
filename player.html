@@ -3,1352 +3,520 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>BTF TV – Reels Player</title>
+  <title>BTF TV</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    *, *::before, *::after {
-      margin: 0; padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+    :root{--gold:#FFD700;--gold-dim:rgba(255,215,0,.25);--dark:rgba(8,8,8,.97)}
+    html,body{height:100%;width:100%;overflow:hidden;background:#000;font-family:'Poppins',sans-serif;color:#fff}
+    #player{position:fixed;inset:0;background:#000}
+    #video{width:100%;height:100%;object-fit:contain;background:#000;pointer-events:none;display:block}
 
-    :root {
-      --gold: #FFD700;
-      --gold-dim: rgba(255,215,0,0.3);
-      --dark: rgba(10,10,10,0.96);
-      --bar-grad-top: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, transparent 100%);
-      --bar-grad-bot: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-      --transition-speed: 0.35s;
-    }
+    /* GESTURE */
+    #gest{position:absolute;inset:0;z-index:10;display:flex}
+    .gl,.gr{flex:1;height:100%}
 
-    html, body {
-      height: 100%; width: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: 'Poppins', sans-serif;
-      color: white;
-    }
+    /* TOP BAR */
+    #top-bar{position:absolute;top:0;left:0;right:0;padding:max(env(safe-area-inset-top,16px),16px) 14px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.82) 0%,transparent 100%);z-index:20;display:flex;align-items:center;gap:10px;transition:opacity .25s,visibility .25s}
+    #top-bar.hide{opacity:0;visibility:hidden;pointer-events:none}
 
-    /* ======== VIEWPORT / REEL STACK ======== */
-    #reels-viewport {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      background: #000;
-    }
+    /* BOTTOM BAR */
+    #bot-bar{position:absolute;bottom:0;left:0;right:0;padding:14px 14px max(env(safe-area-inset-bottom,20px),20px);background:linear-gradient(to top,rgba(0,0,0,.9) 0%,transparent 100%);z-index:20;transition:opacity .25s,visibility .25s}
+    #bot-bar.hide{opacity:0;visibility:hidden;pointer-events:none}
 
-    /* The sliding container holding all episode wrappers */
-    #reels-track {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      /* height set by JS = episodes * 100% */
-      will-change: transform;
-      transition: transform var(--transition-speed) cubic-bezier(0.25,0.46,0.45,0.94);
-    }
-    #reels-track.instant {
-      transition: none !important;
-    }
+    /* ICON BTN */
+    .ibtn{width:40px;height:40px;border-radius:50%;background:rgba(28,28,28,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;cursor:pointer;flex-shrink:0;transition:background .12s,transform .1s}
+    .ibtn:active{transform:scale(.9);background:var(--gold);color:#000}
+    .ibtn.gold{color:var(--gold);border-color:var(--gold-dim)}
 
-    /* Each episode slide */
-    .reel-slide {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      background: #000;
-      overflow: hidden;
-    }
+    #show-title{font-family:'Bebas Neue',cursive;font-size:1.35rem;letter-spacing:1px;text-shadow:0 2px 8px rgba(0,0,0,.9);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-    .reel-slide video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      background: #000;
-      display: block;
-    }
+    /* EPISODE INFO */
+    #ep-title{font-family:'Bebas Neue',cursive;font-size:1.75rem;color:var(--gold);line-height:1.1;letter-spacing:1px;text-shadow:0 2px 10px rgba(0,0,0,.8);margin-bottom:4px}
+    #ep-meta{font-size:.7rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px;margin-bottom:12px}
+    #ep-meta .dot{opacity:.4}
 
-    /* ======== TOP BAR ======== */
-    .top-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      padding: env(safe-area-inset-top, 16px) 16px 16px;
-      padding-top: max(env(safe-area-inset-top), 16px);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--bar-grad-top);
-      z-index: 20;
-      transition: opacity 0.25s, visibility 0.25s;
-    }
-    .top-bar.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    /* CONTROLS ROW */
+    #ctrl-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    #pp-btn{width:46px;height:46px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#000;flex-shrink:0;box-shadow:0 4px 18px rgba(255,215,0,.45);transition:transform .1s}
+    #pp-btn:active{transform:scale(.88)}
+    #ep-ctr{margin-left:auto;font-size:.7rem;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.5px}
 
-    .icon-btn {
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      background: rgba(30,30,30,0.85);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.15);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; color: white;
-      cursor: pointer; flex-shrink: 0;
-      transition: background 0.15s, color 0.15s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .icon-btn:active { background: var(--gold); color: #000; transform: scale(0.92); }
+    /* PROGRESS */
+    #prog-wrap{width:100%;height:24px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+    #prog-track{flex:1;height:3px;background:rgba(255,255,255,.18);border-radius:4px;position:relative;transition:height .15s}
+    #prog-wrap:active #prog-track{height:5px}
+    #prog-fill{height:100%;background:var(--gold);border-radius:4px;width:0%;pointer-events:none}
+    #prog-hnd{width:13px;height:13px;background:var(--gold);border-radius:50%;position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;transition:opacity .15s;box-shadow:0 2px 8px rgba(255,215,0,.5)}
+    #prog-wrap:active #prog-hnd{opacity:1}
+    #time-row{display:flex;justify-content:space-between;font-size:.63rem;color:rgba(255,255,255,.5);margin-top:4px}
 
-    .show-title {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 1.4rem;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
-      letter-spacing: 1px;
-    }
+    /* SKIP RIPPLE */
+    .skip-rp{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:50;pointer-events:none;opacity:0;transition:opacity .15s}
+    .skip-rp.L{left:20px}.skip-rp.R{right:20px}
+    .skip-rp.on{opacity:1}
+    .sk-circle{width:68px;height:68px;border-radius:50%;background:rgba(255,215,0,.12);border:2px solid rgba(255,215,0,.45);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--gold);backdrop-filter:blur(4px)}
+    .skip-rp span{font-size:.65rem;font-weight:700;color:var(--gold);letter-spacing:.5px}
 
-    .playlist-btn {
-      color: var(--gold);
-      border-color: var(--gold-dim);
-      margin-left: auto;
-    }
+    /* CENTER ICON */
+    #ci{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.6);width:70px;height:70px;border-radius:50%;background:rgba(255,215,0,.92);display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#000;z-index:40;opacity:0;pointer-events:none;transition:opacity .2s,transform .25s cubic-bezier(.34,1.56,.64,1)}
+    #ci.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
-    /* ======== BOTTOM BAR ======== */
-    .bottom-bar {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 20px 16px;
-      padding-bottom: max(env(safe-area-inset-bottom), 24px);
-      background: var(--bar-grad-bot);
-      z-index: 20;
-      transition: opacity 0.25s, visibility 0.25s;
-    }
-    .bottom-bar.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    /* SPINNER */
+    #spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;z-index:55;display:none}
+    #spin.on{display:block}
+    @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-    .episode-info { margin-bottom: 14px; }
+    /* ERROR BOX — only .on triggers display */
+    #err{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.65);z-index:60}
+    #err.on{display:flex}
+    #err i{font-size:2.8rem;color:var(--gold)}
+    #err p{font-size:.88rem;color:#bbb}
+    #retry{padding:10px 28px;background:var(--gold);color:#000;border:none;border-radius:40px;font-weight:700;font-size:.85rem;cursor:pointer}
+    #retry:active{transform:scale(.95)}
 
-    .episode-title {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 1.9rem;
-      color: var(--gold);
-      line-height: 1.1;
-      letter-spacing: 1px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    }
+    /* DRAWER */
+    #dback{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:29;display:none}
+    #dback.on{display:block}
+    #drawer{position:absolute;right:0;top:0;bottom:0;width:235px;z-index:30;background:var(--dark);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(255,215,0,.12);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+    #drawer.on{transform:translateX(0)}
+    .dhead{padding:18px 18px 12px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+    .dhead span{font-family:'Bebas Neue',cursive;font-size:1.15rem;color:var(--gold);letter-spacing:2px}
+    .dcls{background:none;border:none;color:#666;font-size:1rem;cursor:pointer}
+    #dlist{overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:#2a2a2a transparent}
+    .di{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:10px;cursor:pointer;color:#aaa;font-size:.83rem;font-weight:500;transition:background .15s}
+    .di:active{background:rgba(255,215,0,.08)}
+    .di.active{background:rgba(255,215,0,.1);color:var(--gold);border-left:3px solid var(--gold);padding-left:15px}
+    .di.locked{color:#555;cursor:default}
+    .dnum{font-family:'Bebas Neue',cursive;font-size:1.1rem;color:var(--gold);width:28px;flex-shrink:0}
+    .di.locked .dnum{color:#444}
+    .dlk{margin-left:auto;color:var(--gold);font-size:.75rem}
 
-    .episode-meta {
-      font-size: 0.72rem;
-      color: #bbb;
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-      align-items: center;
-    }
-    .episode-meta span {
-      display: flex; align-items: center; gap: 4px;
-    }
+    /* NEXT OVERLAY */
+    #next-ov{position:absolute;bottom:105px;left:14px;right:14px;background:rgba(12,12,12,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--gold-dim);border-radius:14px;padding:14px 18px;z-index:35;display:flex;align-items:center;justify-content:space-between;transform:translateY(130px);opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.34,1.3,.64,1),opacity .3s}
+    #next-ov.on{transform:translateY(0);opacity:1;pointer-events:auto}
+    .ni{flex:1}
+    .nlbl{font-size:.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px}
+    .ntit{font-weight:600;font-size:.9rem;margin-top:2px}
+    .nact{display:flex;gap:12px}
+    .nbtn{background:none;border:none;color:#fff;font-size:1.15rem;cursor:pointer;padding:6px}
+    .nbtn:active{color:var(--gold)}
 
-    /* playback controls row */
-    .controls-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 10px;
-    }
+    /* TOAST */
+    #toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%) translateY(18px);background:rgba(18,18,18,.95);color:#fff;border:1px solid #2a2a2a;padding:9px 22px;border-radius:40px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;pointer-events:none;transition:all .28s cubic-bezier(.34,1.3,.64,1);white-space:nowrap;backdrop-filter:blur(8px);max-width:85vw;text-align:center}
+    #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-    .play-pause-btn {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--gold);
-      border: none;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem;
-      color: #000;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 0.1s, background 0.15s;
-      box-shadow: 0 4px 16px rgba(255,215,0,0.4);
-    }
-    .play-pause-btn:active { transform: scale(0.9); }
+    /* SLIDE TRANSITION */
+    @keyframes sld{from{opacity:.15;transform:translateY(var(--fy,35px))}to{opacity:1;transform:translateY(0)}}
+    #player.sld{animation:sld .32s cubic-bezier(.25,.46,.45,.94) forwards}
 
-    .vol-btn {
-      font-size: 1.1rem;
-      color: rgba(255,255,255,0.8);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 6px;
-    }
-
-    .ep-counter {
-      font-size: 0.72rem;
-      color: #bbb;
-      margin-left: auto;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    /* ======== PROGRESS BAR ======== */
-    .progress-container {
-      width: 100%;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      touch-action: none;
-    }
-
-    .progress-track {
-      flex: 1;
-      height: 3px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 4px;
-      position: relative;
-      transition: height 0.15s;
-    }
-    .progress-container:active .progress-track { height: 5px; }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--gold);
-      border-radius: 4px;
-      width: 0%;
-      pointer-events: none;
-      transition: width 0.1s linear;
-    }
-
-    .progress-handle {
-      width: 14px; height: 14px;
-      background: var(--gold);
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 0%;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 0.15s;
-      pointer-events: none;
-      box-shadow: 0 2px 8px rgba(255,215,0,0.5);
-    }
-    .progress-container:active .progress-handle { opacity: 1; }
-
-    .time-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: rgba(255,255,255,0.6);
-      margin-top: 4px;
-    }
-
-    /* ======== GESTURE OVERLAY ======== */
-    .gesture-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      z-index: 10;
-    }
-    .gesture-left, .gesture-right {
-      flex: 1; height: 100%;
-    }
-
-    /* ======== SKIP RIPPLE ANIMATION ======== */
-    .skip-ripple {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      z-index: 50;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .skip-ripple.left  { left: 16px; }
-    .skip-ripple.right { right: 16px; }
-    .skip-ripple.show  { opacity: 1; }
-    .skip-ripple .ripple-circle {
-      width: 70px; height: 70px;
-      border-radius: 50%;
-      background: rgba(255,215,0,0.15);
-      border: 2px solid rgba(255,215,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
-      color: var(--gold);
-      backdrop-filter: blur(4px);
-    }
-    .skip-ripple span {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: 0.5px;
-    }
-
-    /* ======== CENTER ICON ======== */
-    .center-icon {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0.7);
-      width: 72px; height: 72px;
-      background: rgba(255,215,0,0.95);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.9rem;
-      color: #000;
-      z-index: 40;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .center-icon.visible {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    /* ======== LOADING SPINNER ======== */
-    #spinner {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 48px; height: 48px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      z-index: 50;
-      display: none;
-    }
-    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-    #spinner.show { display: block; }
-
-    /* ======== PLAYLIST DRAWER ======== */
-    .playlist-drawer {
-      position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 230px;
-      background: rgba(8,8,8,0.97);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-left: 1px solid rgba(255,215,0,0.15);
-      z-index: 30;
-      transform: translateX(100%);
-      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-      display: flex;
-      flex-direction: column;
-    }
-    .playlist-drawer.open { transform: translateX(0); }
-
-    .drawer-header {
-      padding: 18px 20px 14px;
-      border-bottom: 1px solid #1a1a1a;
-      font-family: 'Bebas Neue', cursive;
-      font-size: 1.2rem;
-      color: var(--gold);
-      letter-spacing: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .drawer-close {
-      background: none; border: none;
-      color: #666; font-size: 1rem; cursor: pointer;
-    }
-
-    .drawer-list {
-      overflow-y: auto;
-      flex: 1;
-      scrollbar-width: thin;
-      scrollbar-color: #333 transparent;
-    }
-
-    .drawer-item {
-      padding: 13px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      color: #ccc;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: background 0.15s, padding-left 0.15s;
-      position: relative;
-    }
-    .drawer-item:active { background: rgba(255,215,0,0.08); }
-    .drawer-item.active {
-      background: rgba(255,215,0,0.1);
-      color: var(--gold);
-      border-left: 3px solid var(--gold);
-      padding-left: 17px;
-    }
-    .drawer-item.locked { color: #555; }
-    .drawer-item.locked .lock-icon {
-      margin-left: auto;
-      color: var(--gold);
-      font-size: 0.8rem;
-    }
-    .drawer-item .ep-num {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 1.1rem;
-      color: var(--gold);
-      width: 30px;
-      flex-shrink: 0;
-    }
-    .drawer-item.locked .ep-num { color: #555; }
-
-    /* Drawer overlay backdrop */
-    .drawer-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 29;
-      display: none;
-    }
-    .drawer-backdrop.show { display: block; }
-
-    /* ======== NEXT EPISODE OVERLAY ======== */
-    .next-overlay {
-      position: absolute;
-      bottom: 110px;
-      left: 16px; right: 16px;
-      background: rgba(15,15,15,0.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 16px;
-      padding: 16px 20px;
-      border: 1px solid var(--gold-dim);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 35;
-      transform: translateY(120px);
-      opacity: 0;
-      transition: all 0.35s cubic-bezier(0.34,1.3,0.64,1);
-      pointer-events: none;
-    }
-    .next-overlay.show {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .next-info { flex: 1; }
-    .next-label { font-size: 0.65rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
-    .next-title { font-weight: 600; font-size: 0.92rem; margin-top: 2px; }
-    .next-actions { display: flex; gap: 14px; }
-    .next-btn {
-      background: none; border: none;
-      color: white; font-size: 1.2rem;
-      cursor: pointer; padding: 6px;
-      transition: color 0.15s;
-    }
-    .next-btn:active { color: var(--gold); }
-
-    /* ======== TOAST ======== */
-    #toast {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(20,20,20,0.95);
-      color: white;
-      border: 1px solid #333;
-      padding: 10px 22px;
-      border-radius: 40px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      z-index: 999;
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.34,1.3,0.64,1);
-      pointer-events: none;
-      white-space: nowrap;
-      backdrop-filter: blur(8px);
-    }
-    #toast.on {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* ======== SWIPE HINT ======== */
-    .swipe-hint {
-      position: absolute;
-      top: 50%;
-      right: 16px;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      opacity: 0;
-      pointer-events: none;
-      animation: swipeHintAnim 2s ease-in-out;
-      z-index: 15;
-    }
-    .swipe-hint i { font-size: 1.4rem; color: rgba(255,255,255,0.6); animation: bounce 0.6s ease-in-out infinite alternate; }
-    .swipe-hint span { font-size: 0.65rem; color: rgba(255,255,255,0.5); letter-spacing: 0.5px; }
-    @keyframes swipeHintAnim {
-      0%   { opacity: 0; } 20%  { opacity: 1; }
-      80%  { opacity: 1; } 100% { opacity: 0; }
-    }
-    @keyframes bounce { to { transform: translateY(-6px); } }
-
-    /* ======== EPISODE TRANSITION ======== */
-    .reel-slide.transitioning-out {
-      animation: slideOutUp 0.35s ease forwards;
-    }
-    .reel-slide.transitioning-in {
-      animation: slideInUp 0.35s ease forwards;
-    }
-    @keyframes slideOutUp { to { opacity: 0.3; filter: blur(2px) scale(0.98); } }
-    @keyframes slideInUp  { from { opacity: 0.3; filter: blur(2px) scale(0.98); } to { opacity: 1; filter: none; } }
-
-    /* ======== ERROR STATE ======== */
-    .video-error {
-      position: absolute;
-      inset: 0;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      background: rgba(0,0,0,0.85);
-      z-index: 60;
-    }
-    .video-error.show { display: flex; }
-    .video-error i { font-size: 3rem; color: var(--gold); }
-    .video-error p { font-size: 0.9rem; color: #bbb; }
-    .retry-btn {
-      padding: 10px 28px;
-      background: var(--gold);
-      color: #000;
-      border: none;
-      border-radius: 40px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      letter-spacing: 0.5px;
-    }
+    /* BUFFER LABEL */
+    #buflbl{position:absolute;top:50%;left:50%;transform:translate(-50%,calc(-50% + 42px));font-size:.7rem;color:rgba(255,255,255,.45);z-index:56;display:none;letter-spacing:.5px}
+    #buflbl.on{display:block}
   </style>
 </head>
 <body>
+<div id="player">
+  <video id="video" playsinline preload="auto" disablepictureinpicture x-webkit-airplay="deny"></video>
 
-  <!-- Single reel viewport -->
-  <div id="reels-viewport">
+  <div id="gest"><div class="gl" id="gl"></div><div class="gr" id="gr"></div></div>
 
-    <!-- Single video wrapper (we move episodes via transforms) -->
-    <div id="current-slide" style="position:relative;width:100%;height:100%;background:#000;">
+  <div class="skip-rp L" id="sk-l"><div class="sk-circle"><i class="fas fa-backward"></i></div><span>–10s</span></div>
+  <div class="skip-rp R" id="sk-r"><div class="sk-circle"><i class="fas fa-forward"></i></div><span>+10s</span></div>
 
-      <video id="video" playsinline preload="auto" disablepictureinpicture
-             x-webkit-airplay="deny"></video>
-
-      <!-- Gesture overlay: left / right for double-tap skip -->
-      <div class="gesture-overlay">
-        <div class="gesture-left"  id="gesture-left"></div>
-        <div class="gesture-right" id="gesture-right"></div>
-      </div>
-
-      <!-- Skip ripples -->
-      <div class="skip-ripple left" id="skip-left">
-        <div class="ripple-circle"><i class="fas fa-backward"></i></div>
-        <span>10 SEC</span>
-      </div>
-      <div class="skip-ripple right" id="skip-right">
-        <div class="ripple-circle"><i class="fas fa-forward"></i></div>
-        <span>10 SEC</span>
-      </div>
-
-      <!-- Top bar -->
-      <div class="top-bar" id="top-bar">
-        <button class="icon-btn" id="back-btn" aria-label="Back">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <div class="show-title" id="show-title">…</div>
-        <button class="icon-btn playlist-btn" id="playlist-toggle" aria-label="Episodes">
-          <i class="fas fa-list-ul"></i>
-        </button>
-      </div>
-
-      <!-- Bottom bar -->
-      <div class="bottom-bar" id="bottom-bar">
-        <div class="episode-info">
-          <div class="episode-title" id="ep-title"></div>
-          <div class="episode-meta" id="ep-meta"></div>
-        </div>
-
-        <!-- Controls row -->
-        <div class="controls-row">
-          <button class="play-pause-btn" id="play-pause-btn" aria-label="Play/Pause">
-            <i class="fas fa-play" id="pp-icon"></i>
-          </button>
-          <button class="vol-btn icon-btn" id="vol-btn" aria-label="Mute">
-            <i class="fas fa-volume-up" id="vol-icon"></i>
-          </button>
-          <span class="ep-counter" id="ep-counter">Ep 1 / 1</span>
-        </div>
-
-        <!-- Progress bar -->
-        <div class="progress-container" id="progress-container" role="slider" aria-label="Seek">
-          <div class="progress-track">
-            <div class="progress-fill" id="progress-fill"></div>
-            <div class="progress-handle" id="progress-handle"></div>
-          </div>
-        </div>
-        <div class="time-row">
-          <span id="current-time">0:00</span>
-          <span id="duration">--:--</span>
-        </div>
-      </div>
-
-      <!-- Playlist drawer backdrop -->
-      <div class="drawer-backdrop" id="drawer-backdrop"></div>
-
-      <!-- Playlist drawer -->
-      <div class="playlist-drawer" id="playlist-drawer">
-        <div class="drawer-header">
-          <span>EPISODES</span>
-          <button class="drawer-close" id="drawer-close" aria-label="Close">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="drawer-list" id="drawer-list"></div>
-      </div>
-
-      <!-- Next episode overlay -->
-      <div class="next-overlay" id="nextOverlay">
-        <div class="next-info">
-          <div class="next-label">अगला एपिसोड</div>
-          <div class="next-title" id="next-title"></div>
-        </div>
-        <div class="next-actions">
-          <button class="next-btn" id="next-cancel" aria-label="Cancel"><i class="fas fa-times"></i></button>
-          <button class="next-btn" id="next-go"     aria-label="Play next"><i class="fas fa-step-forward"></i></button>
-        </div>
-      </div>
-
-      <!-- Center feedback icon -->
-      <div class="center-icon" id="centerIcon"><i class="fas fa-play"></i></div>
-
-      <!-- Spinner -->
-      <div id="spinner"></div>
-
-      <!-- Error state -->
-      <div class="video-error" id="video-error">
-        <i class="fas fa-exclamation-triangle"></i>
-        <p>वीडियो लोड नहीं हुआ</p>
-        <button class="retry-btn" id="retry-btn">फिर से कोशिश करें</button>
-      </div>
-    </div>
-
+  <div id="top-bar">
+    <button class="ibtn" id="back-btn"><i class="fas fa-arrow-left"></i></button>
+    <div id="show-title">…</div>
+    <button class="ibtn gold" id="pl-toggle"><i class="fas fa-list-ul"></i></button>
   </div>
 
-  <!-- Global toast -->
-  <div id="toast" role="status"></div>
+  <div id="bot-bar">
+    <div id="ep-title"></div>
+    <div id="ep-meta"></div>
+    <div id="ctrl-row">
+      <button id="pp-btn"><i class="fas fa-play" id="pp-icon"></i></button>
+      <button class="ibtn" id="vol-btn"><i class="fas fa-volume-up" id="vol-icon"></i></button>
+      <span id="ep-ctr"></span>
+    </div>
+    <div id="prog-wrap">
+      <div id="prog-track"><div id="prog-fill"></div><div id="prog-hnd"></div></div>
+    </div>
+    <div id="time-row"><span id="cur-t">0:00</span><span id="dur-t">--:--</span></div>
+  </div>
+
+  <div id="dback"></div>
+  <div id="drawer">
+    <div class="dhead"><span>EPISODES</span><button class="dcls" id="dcls"><i class="fas fa-times"></i></button></div>
+    <div id="dlist"></div>
+  </div>
+
+  <div id="next-ov">
+    <div class="ni"><div class="nlbl">अगला एपिसोड</div><div class="ntit" id="ntit"></div></div>
+    <div class="nact">
+      <button class="nbtn" id="n-cancel"><i class="fas fa-times"></i></button>
+      <button class="nbtn" id="n-go"><i class="fas fa-step-forward"></i></button>
+    </div>
+  </div>
+
+  <div id="ci"><i class="fas fa-play"></i></div>
+  <div id="spin"></div>
+  <div id="buflbl">बफरिंग…</div>
+
+  <div id="err">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>वीडियो लोड नहीं हुआ</p>
+    <button id="retry">फिर से कोशिश करें</button>
+  </div>
+</div>
+<div id="toast" role="status"></div>
 
 <script>
-(function () {
+(function(){
   'use strict';
 
-  /* =====================================================
-     SECURITY
-  ===================================================== */
-  document.addEventListener('contextmenu', e => e.preventDefault(), true);
-  document.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && 'suacjip'.includes(e.key.toLowerCase())) e.preventDefault();
-    if (e.key === 'F12' || e.key === 'PrintScreen') e.preventDefault();
-  }, true);
-  ['dragstart','drop','selectstart'].forEach(evt =>
-    document.addEventListener(evt, e => e.preventDefault(), true));
-  document.addEventListener('touchstart', e => {
-    if (e.target.tagName === 'VIDEO') e.preventDefault();
-  }, { passive: false });
+  /* SECURITY */
+  document.addEventListener('contextmenu',e=>e.preventDefault(),true);
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&'suacjip'.includes(e.key.toLowerCase()))e.preventDefault();
+    if(e.key==='F12'||e.key==='PrintScreen')e.preventDefault();
+  },true);
+  ['dragstart','drop','selectstart'].forEach(n=>document.addEventListener(n,e=>e.preventDefault(),true));
+  document.addEventListener('touchstart',e=>{if(e.target.tagName==='VIDEO')e.preventDefault();},{passive:false});
 
-  /* =====================================================
-     DEVICE FINGERPRINT  (per-device, per-user cache)
-  ===================================================== */
-  function getDeviceId() {
-    let id = localStorage.getItem('btftv_device_id');
-    if (!id) {
-      const arr = new Uint8Array(16);
-      crypto.getRandomValues(arr);
-      id = [...arr].map(b => b.toString(16).padStart(2,'0')).join('');
-      localStorage.setItem('btftv_device_id', id);
-    }
+  /* DEVICE ID */
+  function getDevId(){
+    let id=localStorage.getItem('btftv_dev');
+    if(!id){const b=new Uint8Array(12);crypto.getRandomValues(b);id=[...b].map(x=>x.toString(16).padStart(2,'0')).join('');localStorage.setItem('btftv_dev',id);}
     return id;
   }
-  const DEVICE_ID  = getDeviceId();
-  const CACHE_NAME = `btftv-v2-${DEVICE_ID}`;   // each device gets own cache bucket
-  const CACHE_TTL  = 2 * 60 * 60 * 1000;         // 2 hours
+  const DEV=getDevId();
+  const CACHE_NS='btftv3-'+DEV;
+  const CACHE_TTL=2*60*60*1000;
+  const H_KEY='btftv_h_'+DEV;
 
-  /* =====================================================
-     SESSION / URL  – per-episode URL parameter
-  ===================================================== */
-  const SESSION_TTL = 60 * 60 * 1000; // 1 hour
-  const CODE_LEN    = 22;
-
-  function genCode() {
-    const ch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let r = '';
-    for (let i = 0; i < CODE_LEN; i++) r += ch[Math.floor(Math.random() * ch.length)];
-    return r;
+  /* SESSION */
+  const SESSION_TTL=60*60*1000;
+  function saveMap(code,sid,ei){
+    const m=JSON.parse(localStorage.getItem('btftv_codes')||'{}');
+    m[code]={sid,ei,exp:Date.now()+SESSION_TTL};
+    for(const k in m)if(m[k].exp<Date.now())delete m[k];
+    localStorage.setItem('btftv_codes',JSON.stringify(m));
   }
+  function loadMap(code){const d=JSON.parse(localStorage.getItem('btftv_codes')||'{}')[code];return d&&d.exp>Date.now()?d:null;}
+  function genCode(){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<22;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 
-  // Save mapping: code → { sid, ei, expiry }
-  function saveMapping(code, sid, ei) {
-    const map = JSON.parse(localStorage.getItem('btftv_codes') || '{}');
-    map[code] = { sid, ei, expiry: Date.now() + SESSION_TTL };
-    // Prune expired codes
-    for (const k in map) if (map[k].expiry < Date.now()) delete map[k];
-    localStorage.setItem('btftv_codes', JSON.stringify(map));
-  }
-
-  function loadMapping(code) {
-    const map = JSON.parse(localStorage.getItem('btftv_codes') || '{}');
-    const d = map[code];
-    if (d && d.expiry > Date.now()) return d;
-    return null;
-  }
-
-  const urlParams = new URLSearchParams(location.search);
-  let code = urlParams.get('code');
-  let sid, ei;
-
-  if (code) {
-    const d = loadMapping(code);
-    if (d) { sid = d.sid; ei = d.ei; }
-    else {
-      toastMsg('सेशन समाप्त हो गया — पुनः लोड करें');
-      setTimeout(() => location.href = 'index.html', 2000);
-      return;
-    }
-  } else {
-    sid = urlParams.get('sid');
-    ei  = parseInt(urlParams.get('ei') || '0', 10);
-    if (!sid) {
-      toastMsg('कोई शो नहीं मिला');
-      setTimeout(() => location.href = 'index.html', 2000);
-      return;
-    }
-    code = genCode();
-    saveMapping(code, sid, ei);
-    // Redirect to clean URL with short code
-    window.location.replace(`${location.pathname}?code=${code}`);
+  const UP=new URLSearchParams(location.search);
+  let code=UP.get('code'),sid,startEp;
+  if(code){
+    const d=loadMap(code);
+    if(d){sid=d.sid;startEp=d.ei;}
+    else{toastMsg('सेशन समाप्त — पुनः लोड करें');setTimeout(()=>location.href='index.html',2000);return;}
+  }else{
+    sid=UP.get('sid');startEp=parseInt(UP.get('ei')||'0',10);
+    if(!sid){toastMsg('शो नहीं मिला');setTimeout(()=>location.href='index.html',2000);return;}
+    code=genCode();saveMap(code,sid,startEp);
+    window.location.replace(location.pathname+'?code='+code);
     return;
   }
 
-  /* =====================================================
-     STATE
-  ===================================================== */
-  let show            = null;
-  let D               = null;
-  let currentEpIndex  = ei;
-  let autoNextTimer   = null;
-  let hideCtrlTimer   = null;
-  let isDragProg      = false;
-  let controlsVisible = true;
-  let isMuted         = false;
+  /* STATE */
+  let show=null,D=null,curEp=startEp;
+  let nextTimer=null,hideTimer=null,isDrag=false;
+  let ctrlVis=true,isMuted=false;
+  let isLoading=false; /* ★ KEY: suppress premature error */
+  let blobUrl=null;
+  let slT=null,srT=null,ciT=null,toastT=null;
+  let tx0=0,ty0=0,tt0=0,lastTap=0;
+  const SW=55,DT=280;
+  let hist=JSON.parse(localStorage.getItem(H_KEY)||'{}');
 
-  // Touch tracking
-  let touchStartX = 0, touchStartY = 0, touchStartTime = 0, lastTapTime = 0;
-  const SWIPE_THRESH = 55, DTAP_DELAY = 280;
+  /* DOM */
+  const video=document.getElementById('video');
+  const pFill=document.getElementById('prog-fill');
+  const pHnd=document.getElementById('prog-hnd');
+  const pWrap=document.getElementById('prog-wrap');
+  const curT=document.getElementById('cur-t');
+  const durT=document.getElementById('dur-t');
+  const drawer=document.getElementById('drawer');
+  const dList=document.getElementById('dlist');
+  const dBack=document.getElementById('dback');
+  const nextOv=document.getElementById('next-ov');
+  const nTit=document.getElementById('ntit');
+  const spin=document.getElementById('spin');
+  const bufLbl=document.getElementById('buflbl');
+  const ci=document.getElementById('ci');
+  const toastEl=document.getElementById('toast');
+  const topBar=document.getElementById('top-bar');
+  const botBar=document.getElementById('bot-bar');
+  const ppBtn=document.getElementById('pp-btn');
+  const ppIco=document.getElementById('pp-icon');
+  const volIco=document.getElementById('vol-icon');
+  const errBox=document.getElementById('err');
+  const skL=document.getElementById('sk-l');
+  const skR=document.getElementById('sk-r');
 
-  // Watch history — keyed per device per show/episode
-  const H_KEY = `btftv_h_${DEVICE_ID}`;
-  let histData = JSON.parse(localStorage.getItem(H_KEY) || '{}');
+  function toastMsg(msg){clearTimeout(toastT);toastEl.textContent=msg;toastEl.classList.add('on');toastT=setTimeout(()=>toastEl.classList.remove('on'),2800);}
+  function fmt(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
 
-  /* =====================================================
-     DOM REFS
-  ===================================================== */
-  const video        = document.getElementById('video');
-  const progFill     = document.getElementById('progress-fill');
-  const progHandle   = document.getElementById('progress-handle');
-  const progCont     = document.getElementById('progress-container');
-  const curTimeEl    = document.getElementById('current-time');
-  const durEl        = document.getElementById('duration');
-  const drawer       = document.getElementById('playlist-drawer');
-  const drawerList   = document.getElementById('drawer-list');
-  const backdrop     = document.getElementById('drawer-backdrop');
-  const nextOverlay  = document.getElementById('nextOverlay');
-  const nextTitleEl  = document.getElementById('next-title');
-  const spinner      = document.getElementById('spinner');
-  const centerIcon   = document.getElementById('centerIcon');
-  const toastEl      = document.getElementById('toast');
-  const topBar       = document.getElementById('top-bar');
-  const bottomBar    = document.getElementById('bottom-bar');
-  const ppBtn        = document.getElementById('play-pause-btn');
-  const ppIcon       = document.getElementById('pp-icon');
-  const volBtn       = document.getElementById('vol-btn');
-  const volIcon      = document.getElementById('vol-icon');
-  const epCounter    = document.getElementById('ep-counter');
-  const errorBox     = document.getElementById('video-error');
-  const skipLeft     = document.getElementById('skip-left');
-  const skipRight    = document.getElementById('skip-right');
-
-  let skipLeftTimer = null, skipRightTimer = null;
-
-  /* =====================================================
-     TOAST
-  ===================================================== */
-  let toastTimer;
-  function toastMsg(msg) {
-    clearTimeout(toastTimer);
-    toastEl.textContent = msg;
-    toastEl.classList.add('on');
-    toastTimer = setTimeout(() => toastEl.classList.remove('on'), 2800);
+  /* CACHE */
+  async function getCached(url){
+    if(!('caches'in window))return null;
+    try{const c=await caches.open(CACHE_NS),r=await c.match(url);if(!r)return null;const t=r.headers.get('x-btf-t');if(t&&(Date.now()-parseInt(t))<CACHE_TTL)return r;await c.delete(url);return null;}catch{return null;}
+  }
+  async function putCache(url,blob){
+    if(!('caches'in window))return;
+    try{const c=await caches.open(CACHE_NS),h=new Headers({'Content-Type':'video/mp4','x-btf-t':Date.now().toString()});await c.put(url,new Response(blob,{headers:h}));}catch(e){console.warn(e);}
   }
 
-  /* =====================================================
-     TIME FORMAT
-  ===================================================== */
-  function fmt(s) {
-    if (!s || isNaN(s)) return '0:00';
-    const m = Math.floor(s / 60), ss = Math.floor(s % 60);
-    return m + ':' + (ss < 10 ? '0' : '') + ss;
-  }
+  /* ★★★ LOAD VIDEO — isLoading flag prevents fake error display ★★★ */
+  async function loadVideo(url){
+    isLoading=true;             // ← SUPPRESS error events during reset
+    errBox.classList.remove('on');
+    spin.classList.add('on');
+    bufLbl.classList.remove('on');
 
-  /* =====================================================
-     CACHE — per-device
-  ===================================================== */
-  async function getCached(url) {
-    if (!('caches' in window)) return null;
-    try {
-      const c = await caches.open(CACHE_NAME);
-      const r = await c.match(url);
-      if (!r) return null;
-      const t = r.headers.get('x-btf-cached');
-      if (t && (Date.now() - parseInt(t)) < CACHE_TTL) return r;
-      await c.delete(url);
-      return null;
-    } catch { return null; }
-  }
+    try{video.pause();}catch{}
+    video.removeAttribute('src');
+    video.load();               // May fire 'error' internally — we suppress it
 
-  async function setCache(url, blob) {
-    if (!('caches' in window)) return;
-    try {
-      const c = await caches.open(CACHE_NAME);
-      const h = new Headers({ 'Content-Type': 'video/mp4', 'x-btf-cached': Date.now().toString() });
-      await c.put(url, new Response(blob, { headers: h }));
-    } catch (e) { console.warn('cache set failed', e); }
-  }
+    if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}
 
-  /* =====================================================
-     VIDEO LOAD WITH CACHE
-  ===================================================== */
-  let blobUrl = null;
+    // Wait for internal events to flush, THEN allow real errors
+    await new Promise(r=>setTimeout(r,80));
+    isLoading=false;            // ← NOW errors are genuine
 
-  async function loadVideo(url) {
-    spinner.classList.add('show');
-    errorBox.classList.remove('show');
-    video.pause();
-    video.src = '';
-    if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
-
-    try {
-      const cached = await getCached(url);
-      if (cached) {
-        blobUrl = URL.createObjectURL(await cached.blob());
-        video.src = blobUrl;
-      } else {
-        // Stream directly for speed; cache in background
-        video.src = url;
-        fetch(url, { mode: 'cors' })
-          .then(r => r.ok ? r.blob() : null)
-          .then(b => { if (b) setCache(url, b); })
-          .catch(() => {});
+    try{
+      const cached=await getCached(url);
+      if(cached){
+        blobUrl=URL.createObjectURL(await cached.blob());
+        video.src=blobUrl;
+      }else{
+        video.src=url;
+        // Cache in background silently
+        fetch(url,{mode:'cors'}).then(r=>r.ok?r.blob():null).then(b=>{if(b)putCache(url,b);}).catch(()=>{});
       }
       video.load();
-      video.play().catch(() => {});
-    } catch (e) {
-      toastMsg('वीडियो लोड नहीं हुआ');
-      errorBox.classList.add('show');
-    } finally {
-      spinner.classList.remove('show');
+      video.play().catch(()=>{});
+    }catch(err){
+      spin.classList.remove('on');
+      errBox.classList.add('on');
     }
   }
 
-  /* =====================================================
-     UPDATE URL when episode changes (per-episode URL)
-  ===================================================== */
-  function updateEpisodeUrl(epIndex) {
-    const ep = show.episodes[epIndex];
-    if (!ep) return;
-    // Store mapping with new episode index
-    saveMapping(code, sid, epIndex);
-    // Update browser URL without reload — episode-specific
-    const newUrl = `${location.pathname}?code=${code}&ep=${epIndex}`;
-    history.replaceState({ sid, ep: epIndex }, document.title, newUrl);
+  /* URL — clean, no &ep= */
+  function updateURL(epIdx){
+    saveMap(code,sid,epIdx);
+    history.replaceState({sid,ep:epIdx},document.title,location.pathname+'?code='+code);
   }
 
-  /* =====================================================
-     LOAD DATA
-  ===================================================== */
-  async function loadData() {
-    try {
-      const res = await fetch('https://storytv.btfcompanystorage.workers.dev/data');
-      if (!res.ok) throw new Error('bad response');
-      D = await res.json();
-    } catch {
-      toastMsg('डेटा लोड नहीं हुआ'); return;
-    }
-
-    show = D.shows.find(s => s.id === sid);
-    if (!show) { toastMsg('शो नहीं मिला'); return; }
-
-    if (D.site?.favicon_url) {
-      let lk = document.querySelector("link[rel='icon']") || document.createElement('link');
-      lk.rel = 'icon'; lk.href = D.site.favicon_url;
-      document.head.appendChild(lk);
-    }
-
-    document.getElementById('show-title').textContent = show.title || 'BTF TV';
+  /* LOAD DATA */
+  async function loadData(){
+    spin.classList.add('on');
+    try{const res=await fetch('https://storytv.btfcompanystorage.workers.dev/data');if(!res.ok)throw new Error();D=await res.json();}
+    catch{toastMsg('डेटा लोड नहीं हुआ');spin.classList.remove('on');return;}
+    show=D.shows.find(s=>s.id===sid);
+    if(!show){toastMsg('शो नहीं मिला');spin.classList.remove('on');return;}
+    if(D.site?.favicon_url){const lk=document.querySelector("link[rel='icon']")||document.createElement('link');lk.rel='icon';lk.href=D.site.favicon_url;document.head.appendChild(lk);}
+    document.getElementById('show-title').textContent=show.title||'BTF TV';
     buildPlaylist();
-    loadEpisode(currentEpIndex, true);
-
-    // Show swipe hint on first visit
-    if (!localStorage.getItem('btftv_hint_shown')) {
-      const hint = document.createElement('div');
-      hint.className = 'swipe-hint';
-      hint.innerHTML = '<i class="fas fa-arrows-alt-v"></i><span>SWIPE</span>';
-      document.getElementById('current-slide').appendChild(hint);
-      setTimeout(() => hint.remove(), 2200);
-      localStorage.setItem('btftv_hint_shown', '1');
-    }
+    loadEpisode(curEp,0);
   }
 
-  /* =====================================================
-     LOAD EPISODE
-  ===================================================== */
-  function loadEpisode(index, instant = false) {
-    const ep = show.episodes[index];
-    if (!ep) return;
+  /* LOAD EPISODE */
+  function loadEpisode(idx,dir){
+    const ep=show.episodes[idx];if(!ep)return;
+    curEp=idx;
+    document.getElementById('ep-title').textContent=ep.title||'एपिसोड '+ep.ep;
+    document.getElementById('ep-meta').innerHTML='<span>Ep '+ep.ep+'</span><span class="dot">•</span><span>'+(ep.duration||'--')+'</span><span class="dot">•</span><span>'+(show.language||'Hindi')+'</span>';
+    document.title='Ep '+ep.ep+' – '+show.title+' | BTF TV';
+    document.getElementById('ep-ctr').textContent=ep.ep+' / '+show.episodes.length;
+    updateURL(idx);
+    hlDrawer(idx);
 
-    currentEpIndex = index;
+    if(dir!==0){
+      const pl=document.getElementById('player');
+      pl.style.setProperty('--fy',dir>0?'35px':'-35px');
+      pl.classList.remove('sld');void pl.offsetWidth;pl.classList.add('sld');
+      setTimeout(()=>pl.classList.remove('sld'),400);
+    }
 
-    // Update UI
-    document.getElementById('ep-title').textContent = ep.title || `एपिसोड ${ep.ep}`;
-    document.getElementById('ep-meta').innerHTML =
-      `<span><i class="fas fa-film"></i> Ep ${ep.ep}</span>` +
-      `<span>·</span><span>${ep.duration || '--'}</span>` +
-      `<span>·</span><span>${show.language || 'Hindi'}</span>`;
-    document.title = `Ep ${ep.ep} – ${show.title} | BTF TV`;
-
-    epCounter.textContent = `Ep ${ep.ep} / ${show.episodes.length}`;
-
-    // Per-episode URL update
-    updateEpisodeUrl(index);
-
-    // Highlight active in playlist
-    document.querySelectorAll('.drawer-item').forEach((item, i) => {
-      item.classList.toggle('active', i === index);
-    });
-
-    // Load video
     loadVideo(ep.video_url);
 
-    // Restore progress
-    const key = `${sid}_${index}`;
-    const saved = histData[key]?.t || 0;
-    if (saved > 3) {
-      const onCP = () => { video.currentTime = saved; video.removeEventListener('canplay', onCP); };
-      video.addEventListener('canplay', onCP);
-    }
-
-    hideNextOverlay();
-    resetProgress();
+    const key=sid+'_'+idx,saved=hist[key]?.t||0;
+    if(saved>4){const f=()=>{video.currentTime=saved;video.removeEventListener('canplay',f);};video.addEventListener('canplay',f);}
+    hideNextOv();resetProg();
   }
 
-  function resetProgress() {
-    progFill.style.width = '0%';
-    progHandle.style.left = '0%';
-    curTimeEl.textContent = '0:00';
-    durEl.textContent = '--:--';
-  }
+  function resetProg(){pFill.style.width='0%';pHnd.style.left='0%';curT.textContent='0:00';durT.textContent='--:--';}
 
-  /* =====================================================
-     PLAYLIST
-  ===================================================== */
-  function buildPlaylist() {
-    let html = '';
-    show.episodes.forEach((ep, i) => {
-      const active = i === currentEpIndex ? 'active' : '';
-      const locked = ep.is_free ? '' : 'locked';
-      html += `<div class="drawer-item ${active} ${locked}" data-index="${i}">
-        <span class="ep-num">${ep.ep}</span>
-        <span class="ep-label">${ep.title || 'Episode ' + ep.ep}</span>
-        ${!ep.is_free ? '<i class="fas fa-lock lock-icon"></i>' : ''}
-      </div>`;
+  /* PLAYLIST */
+  function buildPlaylist(){
+    let h='';
+    show.episodes.forEach((ep,i)=>{
+      const a=i===curEp?'active':'',l=ep.is_free?'':'locked';
+      h+='<div class="di '+a+' '+l+'" data-i="'+i+'"><span class="dnum">'+ep.ep+'</span><span>'+(ep.title||'Episode '+ep.ep)+'</span>'+(ep.is_free?'':'<i class="fas fa-lock dlk"></i>')+'</div>';
     });
-    drawerList.innerHTML = html;
-
-    drawerList.querySelectorAll('.drawer-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const idx = parseInt(item.dataset.index, 10);
-        if (idx === currentEpIndex) { closeDrawer(); return; }
-        const ep = show.episodes[idx];
-        if (!ep.is_free) { toastMsg('🔒 यह एपिसोड GOLD सब्सक्राइबर्स के लिए है'); return; }
-        clearAutoNext();
-        loadEpisode(idx);
-        closeDrawer();
+    dList.innerHTML=h;
+    dList.querySelectorAll('.di').forEach(el=>{
+      el.addEventListener('click',()=>{
+        const idx=parseInt(el.dataset.i,10);
+        if(idx===curEp){closeDr();return;}
+        if(!show.episodes[idx].is_free){toastMsg('🔒 GOLD के लिए है');return;}
+        clrNext();loadEpisode(idx,idx>curEp?1:-1);closeDr();
       });
     });
   }
+  function hlDrawer(idx){dList.querySelectorAll('.di').forEach((el,i)=>el.classList.toggle('active',i===idx));}
+  function openDr(){drawer.classList.add('on');dBack.classList.add('on');}
+  function closeDr(){drawer.classList.remove('on');dBack.classList.remove('on');}
+  document.getElementById('pl-toggle').addEventListener('click',openDr);
+  document.getElementById('dcls').addEventListener('click',closeDr);
+  dBack.addEventListener('click',closeDr);
 
-  function openDrawer() {
-    drawer.classList.add('open');
-    backdrop.classList.add('show');
-  }
-  function closeDrawer() {
-    drawer.classList.remove('open');
-    backdrop.classList.remove('show');
-  }
+  /* CONTROLS */
+  function showCtrl(){ctrlVis=true;topBar.classList.remove('hide');botBar.classList.remove('hide');resetHT();}
+  function hideCtrl(){ctrlVis=false;topBar.classList.add('hide');botBar.classList.add('hide');}
+  function resetHT(){clearTimeout(hideTimer);if(!video.paused)hideTimer=setTimeout(hideCtrl,3000);}
 
-  document.getElementById('playlist-toggle').addEventListener('click', openDrawer);
-  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
-  backdrop.addEventListener('click', closeDrawer);
+  /* PLAY/PAUSE */
+  function setPP(p){ppIco.className=p?'fas fa-pause':'fas fa-play';}
+  function togglePlay(){if(video.paused)video.play().catch(()=>{});else video.pause();}
+  ppBtn.addEventListener('click',e=>{e.stopPropagation();togglePlay();});
 
-  /* =====================================================
-     CONTROLS SHOW / HIDE
-  ===================================================== */
-  function showControls() {
-    controlsVisible = true;
-    topBar.classList.remove('hidden');
-    bottomBar.classList.remove('hidden');
-    resetHideTimer();
-  }
-
-  function hideControls() {
-    controlsVisible = false;
-    topBar.classList.add('hidden');
-    bottomBar.classList.add('hidden');
-  }
-
-  function resetHideTimer() {
-    clearTimeout(hideCtrlTimer);
-    if (!video.paused) {
-      hideCtrlTimer = setTimeout(hideControls, 3000);
-    }
-  }
-
-  /* =====================================================
-     PLAY / PAUSE
-  ===================================================== */
-  function setPlayIcon(playing) {
-    ppIcon.className = playing ? 'fas fa-pause' : 'fas fa-play';
-  }
-
-  function togglePlay() {
-    if (video.paused) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  }
-
-  ppBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    togglePlay();
-    flashCenter(video.paused ? 'pause' : 'play');
+  /* MUTE */
+  document.getElementById('vol-btn').addEventListener('click',e=>{
+    e.stopPropagation();isMuted=!isMuted;video.muted=isMuted;
+    volIco.className=isMuted?'fas fa-volume-mute':'fas fa-volume-up';
+    toastMsg(isMuted?'🔇 म्यूट':'🔊 अनम्यूट');
   });
 
-  /* =====================================================
-     VOLUME / MUTE
-  ===================================================== */
-  volBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    isMuted = !isMuted;
-    video.muted = isMuted;
-    volIcon.className = isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-    toastMsg(isMuted ? '🔇 म्यूट' : '🔊 अनम्यूट');
+  /* SKIP */
+  function showSkip(s){
+    const el=s==='L'?skL:skR,t=s==='L'?slT:srT;
+    clearTimeout(t);el.classList.add('on');
+    const nt=setTimeout(()=>el.classList.remove('on'),700);
+    if(s==='L')slT=nt;else srT=nt;
+  }
+  function skip(s){video.currentTime=Math.max(0,Math.min(video.duration||0,video.currentTime+s));}
+
+  /* CENTER ICON */
+  function flashCI(a){
+    clearTimeout(ciT);
+    ci.innerHTML=a==='play'?'<i class="fas fa-play"></i>':'<i class="fas fa-pause"></i>';
+    ci.classList.add('on');ciT=setTimeout(()=>ci.classList.remove('on'),650);
+  }
+
+  /* EPISODE CHANGE */
+  function changeEp(dir){
+    const ni=curEp+dir;
+    if(ni<0||ni>=show.episodes.length){toastMsg(dir>0?'📺 आखिरी एपिसोड है':'📺 पहला एपिसोड है');return;}
+    if(!show.episodes[ni].is_free){toastMsg('🔒 यह GOLD है');return;}
+    clrNext();loadEpisode(ni,dir);
+  }
+
+  /* ★ GESTURES: single tap = controls only (NOT play/pause) ★ */
+  const gest=document.getElementById('gest');
+  gest.addEventListener('touchstart',e=>{const t=e.touches[0];tx0=t.clientX;ty0=t.clientY;tt0=Date.now();},{passive:true});
+  gest.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0],dx=t.clientX-tx0,dy=t.clientY-ty0,dt=Date.now()-tt0,now=Date.now();
+    if((now-lastTap)<DT&&Math.abs(dx)<28&&Math.abs(dy)<28){
+      if(t.clientX<window.innerWidth/2){skip(-10);showSkip('L');}else{skip(10);showSkip('R');}
+      lastTap=0;return;
+    }
+    if(Math.abs(dy)>SW&&Math.abs(dy)>Math.abs(dx)*1.4){changeEp(dy<0?1:-1);lastTap=now;return;}
+    if(Math.abs(dx)<18&&Math.abs(dy)<18&&dt<300){
+      if(drawer.classList.contains('on'))closeDr();
+      else if(ctrlVis)hideCtrl();else showCtrl();
+    }
+    lastTap=now;
+  },{passive:true});
+
+  /* PROGRESS */
+  function applyP(cx,seek){
+    const r=pWrap.getBoundingClientRect(),pos=Math.max(0,Math.min(1,(cx-r.left)/r.width));
+    pFill.style.width=(pos*100)+'%';pHnd.style.left=(pos*100)+'%';
+    if(seek&&video.duration)video.currentTime=pos*video.duration;
+    else if(video.duration)curT.textContent=fmt(pos*video.duration);
+  }
+  pWrap.addEventListener('touchstart',e=>{isDrag=true;applyP(e.touches[0].clientX,false);e.stopPropagation();e.preventDefault();},{passive:false});
+  document.addEventListener('touchmove',e=>{if(isDrag){applyP(e.touches[0].clientX,false);e.preventDefault();}},{passive:false});
+  document.addEventListener('touchend',e=>{if(isDrag){isDrag=false;applyP(e.changedTouches[0].clientX,true);}});
+  pWrap.addEventListener('mousedown',e=>{isDrag=true;applyP(e.clientX,false);e.preventDefault();});
+  document.addEventListener('mousemove',e=>{if(isDrag)applyP(e.clientX,false);});
+  document.addEventListener('mouseup',e=>{if(isDrag){isDrag=false;applyP(e.clientX,true);}});
+
+  /* VIDEO EVENTS */
+  video.addEventListener('timeupdate',()=>{
+    if(isDrag||!video.duration)return;
+    const p=video.currentTime/video.duration;
+    pFill.style.width=(p*100)+'%';pHnd.style.left=(p*100)+'%';
+    curT.textContent=fmt(video.currentTime);
+    hist[sid+'_'+curEp]={t:Math.round(video.currentTime),d:Math.round(video.duration)};
+    try{localStorage.setItem(H_KEY,JSON.stringify(hist));}catch{}
+  });
+  video.addEventListener('loadedmetadata',()=>{durT.textContent=fmt(video.duration);});
+  video.addEventListener('play',()=>{setPP(true);flashCI('play');resetHT();spin.classList.remove('on');bufLbl.classList.remove('on');});
+  video.addEventListener('pause',()=>{setPP(false);flashCI('pause');showCtrl();clearTimeout(hideTimer);});
+  video.addEventListener('waiting',()=>{if(!isLoading){spin.classList.add('on');bufLbl.classList.add('on');}});
+  video.addEventListener('canplay',()=>{spin.classList.remove('on');bufLbl.classList.remove('on');});
+  video.addEventListener('playing',()=>{spin.classList.remove('on');bufLbl.classList.remove('on');errBox.classList.remove('on');});
+
+  /* ★ ERROR: ignore if isLoading (reset phase) ★ */
+  video.addEventListener('error',()=>{
+    if(isLoading)return;
+    spin.classList.remove('on');
+    errBox.classList.add('on');
   });
 
-  /* =====================================================
-     SKIP ANIMATION
-  ===================================================== */
-  function showSkip(dir) {
-    if (dir === 'left') {
-      skipLeft.classList.add('show');
-      clearTimeout(skipLeftTimer);
-      skipLeftTimer = setTimeout(() => skipLeft.classList.remove('show'), 600);
-    } else {
-      skipRight.classList.add('show');
-      clearTimeout(skipRightTimer);
-      skipRightTimer = setTimeout(() => skipRight.classList.remove('show'), 600);
-    }
-  }
-
-  function skip(sec) {
-    video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + sec));
-  }
-
-  /* =====================================================
-     CENTER ICON FLASH
-  ===================================================== */
-  let centerTimer;
-  function flashCenter(action) {
-    clearTimeout(centerTimer);
-    if (action === 'play')     centerIcon.innerHTML = '<i class="fas fa-play"></i>';
-    else if (action === 'pause')  centerIcon.innerHTML = '<i class="fas fa-pause"></i>';
-    centerIcon.classList.add('visible');
-    centerTimer = setTimeout(() => centerIcon.classList.remove('visible'), 600);
-  }
-
-  /* =====================================================
-     EPISODE CHANGE WITH SMOOTH TRANSITION
-  ===================================================== */
-  function changeEpisode(dir) {
-    const newIdx = currentEpIndex + dir;
-    if (newIdx < 0 || newIdx >= show.episodes.length) {
-      toastMsg(dir > 0 ? '📺 आखिरी एपिसोड है' : '📺 पहला एपिसोड है');
-      return;
-    }
-    const ep = show.episodes[newIdx];
-    if (!ep.is_free) { toastMsg('🔒 यह एपिसोड GOLD है'); return; }
-
-    clearAutoNext();
-
-    // Slide transition effect
-    const slide = document.getElementById('current-slide');
-    slide.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-    slide.style.transform = `translateY(${dir < 0 ? '30px' : '-30px'})`;
-    slide.style.opacity = '0.3';
-
-    setTimeout(() => {
-      slide.style.transition = 'none';
-      slide.style.transform = `translateY(${dir < 0 ? '-30px' : '30px'})`;
-      slide.style.opacity = '0.3';
-      loadEpisode(newIdx);
-      // Force reflow
-      void slide.offsetHeight;
-      slide.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-      slide.style.transform = 'translateY(0)';
-      slide.style.opacity = '1';
-    }, 300);
-  }
-
-  /* =====================================================
-     TOUCH GESTURES — gesture overlay
-  ===================================================== */
-  const gestureZone = document.querySelector('.gesture-overlay');
-
-  gestureZone.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
-    touchStartTime = Date.now();
-  }, { passive: true });
-
-  gestureZone.addEventListener('touchend', (e) => {
-    const t = e.changedTouches[0];
-    const dX = t.clientX - touchStartX;
-    const dY = t.clientY - touchStartY;
-    const dt = Date.now() - touchStartTime;
-    const now = Date.now();
-
-    // Double-tap detection
-    if ((now - lastTapTime) < DTAP_DELAY && Math.abs(dX) < 25 && Math.abs(dY) < 25) {
-      if (t.clientX < window.innerWidth / 2) {
-        skip(-10); showSkip('left');
-      } else {
-        skip(10); showSkip('right');
-      }
-      lastTapTime = 0;
-      return;
-    }
-
-    // Vertical swipe → episode change
-    if (Math.abs(dY) > SWIPE_THRESH && Math.abs(dY) > Math.abs(dX) * 1.5) {
-      changeEpisode(dY < 0 ? 1 : -1);
-      lastTapTime = now;
-      return;
-    }
-
-    // Single tap → toggle controls visibility only (NOT play/pause)
-    if (Math.abs(dX) < 15 && Math.abs(dY) < 15 && dt < 300) {
-      if (drawer.classList.contains('open')) { closeDrawer(); }
-      else if (controlsVisible) { hideControls(); }
-      else { showControls(); }
-    }
-
-    lastTapTime = now;
-  }, { passive: true });
-
-  /* =====================================================
-     PROGRESS BAR
-  ===================================================== */
-  progCont.addEventListener('touchstart', (e) => {
-    isDragProg = true;
-    applyProgress(e.touches[0], false);
-    e.stopPropagation();
-    e.preventDefault();
-  }, { passive: false });
-
-  document.addEventListener('touchmove', (e) => {
-    if (isDragProg) { applyProgress(e.touches[0], false); e.preventDefault(); }
-  }, { passive: false });
-
-  document.addEventListener('touchend', (e) => {
-    if (isDragProg) {
-      isDragProg = false;
-      if (e.changedTouches[0]) applyProgress(e.changedTouches[0], true);
+  video.addEventListener('ended',()=>{
+    showCtrl();
+    if(curEp<show.episodes.length-1){
+      const nx=show.episodes[curEp+1];
+      nTit.textContent='Ep '+nx.ep+': '+nx.title;
+      nextOv.classList.add('on');
+      nextTimer=setTimeout(()=>{
+        if(nx.is_free){curEp++;loadEpisode(curEp,1);}
+        else{toastMsg('🔒 अगला GOLD है');hideNextOv();}
+      },5000);
     }
   });
 
-  // Mouse (desktop)
-  progCont.addEventListener('mousedown', (e) => {
-    isDragProg = true;
-    applyProgressMouse(e, false);
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', (e) => {
-    if (isDragProg) applyProgressMouse(e, false);
-  });
-  document.addEventListener('mouseup', (e) => {
-    if (isDragProg) { isDragProg = false; applyProgressMouse(e, true); }
-  });
+  document.getElementById('retry').addEventListener('click',()=>{errBox.classList.remove('on');loadEpisode(curEp,0);});
 
-  function applyProgress(touch, seek) {
-    const rect = progCont.getBoundingClientRect();
-    let pos = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-    setProgressUI(pos);
-    if (seek && video.duration) video.currentTime = pos * video.duration;
-    else if (video.duration) curTimeEl.textContent = fmt(pos * video.duration);
-  }
-
-  function applyProgressMouse(e, seek) {
-    const rect = progCont.getBoundingClientRect();
-    let pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    setProgressUI(pos);
-    if (seek && video.duration) video.currentTime = pos * video.duration;
-    else if (video.duration) curTimeEl.textContent = fmt(pos * video.duration);
-  }
-
-  function setProgressUI(pos) {
-    progFill.style.width  = (pos * 100) + '%';
-    progHandle.style.left = (pos * 100) + '%';
-  }
-
-  /* =====================================================
-     VIDEO EVENTS
-  ===================================================== */
-  video.addEventListener('timeupdate', () => {
-    if (isDragProg || !video.duration) return;
-    const pct = video.currentTime / video.duration;
-    setProgressUI(pct);
-    curTimeEl.textContent = fmt(video.currentTime);
-    // Save progress per device per episode
-    const key = `${sid}_${currentEpIndex}`;
-    histData[key] = { sid, ei: currentEpIndex, t: Math.round(video.currentTime), d: Math.round(video.duration) };
-    try { localStorage.setItem(H_KEY, JSON.stringify(histData)); } catch {}
-  });
-
-  video.addEventListener('loadedmetadata', () => {
-    durEl.textContent = fmt(video.duration);
-  });
-
-  video.addEventListener('play', () => {
-    setPlayIcon(true);
-    flashCenter('play');
-    resetHideTimer();
-  });
-
-  video.addEventListener('pause', () => {
-    setPlayIcon(false);
-    showControls();
-    clearTimeout(hideCtrlTimer);
-  });
-
-  video.addEventListener('waiting', () => spinner.classList.add('show'));
-  video.addEventListener('canplay',  () => spinner.classList.remove('show'));
-  video.addEventListener('error',    () => errorBox.classList.add('show'));
-
-  video.addEventListener('ended', () => {
-    if (currentEpIndex < show.episodes.length - 1) {
-      const next = show.episodes[currentEpIndex + 1];
-      nextTitleEl.textContent = `Ep ${next.ep}: ${next.title}`;
-      nextOverlay.classList.add('show');
-      autoNextTimer = setTimeout(() => {
-        if (next.is_free) { currentEpIndex++; loadEpisode(currentEpIndex); }
-        else { toastMsg('🔒 अगला एपिसोड GOLD है'); hideNextOverlay(); }
-      }, 5000);
-    }
-    showControls();
-  });
-
-  /* =====================================================
-     RETRY BUTTON
-  ===================================================== */
-  document.getElementById('retry-btn').addEventListener('click', () => {
-    errorBox.classList.remove('show');
-    loadEpisode(currentEpIndex);
-  });
-
-  /* =====================================================
-     NEXT OVERLAY CONTROLS
-  ===================================================== */
-  document.getElementById('next-cancel').addEventListener('click', () => {
-    clearAutoNext(); hideNextOverlay();
-  });
-  document.getElementById('next-go').addEventListener('click', () => {
-    clearAutoNext();
-    if (currentEpIndex < show.episodes.length - 1) {
-      const next = show.episodes[currentEpIndex + 1];
-      if (!next.is_free) { toastMsg('🔒 GOLD चाहिए'); hideNextOverlay(); return; }
-      currentEpIndex++;
-      loadEpisode(currentEpIndex);
+  function hideNextOv(){nextOv.classList.remove('on');clrNext();}
+  function clrNext(){clearTimeout(nextTimer);nextTimer=null;}
+  document.getElementById('n-cancel').addEventListener('click',hideNextOv);
+  document.getElementById('n-go').addEventListener('click',()=>{
+    clrNext();
+    if(curEp<show.episodes.length-1){
+      const nx=show.episodes[curEp+1];
+      if(!nx.is_free){toastMsg('🔒 GOLD चाहिए');hideNextOv();return;}
+      curEp++;loadEpisode(curEp,1);
     }
   });
 
-  function hideNextOverlay() { nextOverlay.classList.remove('show'); }
-  function clearAutoNext()   { if (autoNextTimer) clearTimeout(autoNextTimer); autoNextTimer = null; }
-
-  /* =====================================================
-     BACK BUTTON
-  ===================================================== */
-  document.getElementById('back-btn').addEventListener('click', () => {
-    video.pause();
-    if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
-    history.back();
+  document.getElementById('back-btn').addEventListener('click',()=>{
+    video.pause();if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}history.back();
   });
 
-  /* =====================================================
-     KEYBOARD SHORTCUTS (desktop)
-  ===================================================== */
-  document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
-    if (e.key === ' ' || e.key === 'k')        { e.preventDefault(); togglePlay(); }
-    else if (e.key === 'ArrowRight' || e.key === 'l') { skip(10); showSkip('right'); }
-    else if (e.key === 'ArrowLeft'  || e.key === 'j') { skip(-10); showSkip('left'); }
-    else if (e.key === 'ArrowUp')   changeEpisode(-1);
-    else if (e.key === 'ArrowDown') changeEpisode(1);
-    else if (e.key === 'm')         volBtn.click();
-    showControls();
+  /* KEYBOARD */
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT')return;
+    if(e.key===' '||e.key==='k'){e.preventDefault();togglePlay();}
+    else if(e.key==='ArrowRight'||e.key==='l'){skip(10);showSkip('R');}
+    else if(e.key==='ArrowLeft'||e.key==='j'){skip(-10);showSkip('L');}
+    else if(e.key==='ArrowDown')changeEp(1);
+    else if(e.key==='ArrowUp')changeEp(-1);
+    else if(e.key==='m')document.getElementById('vol-btn').click();
+    showCtrl();
   });
 
-  /* =====================================================
-     BROWSER BACK/FORWARD → update episode
-  ===================================================== */
-  window.addEventListener('popstate', (e) => {
-    if (e.state?.ep != null) loadEpisode(e.state.ep, true);
-  });
+  window.addEventListener('popstate',e=>{if(e.state?.ep!=null)loadEpisode(e.state.ep,0);});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)video.pause();});
 
-  /* =====================================================
-     VISIBILITY CHANGE — pause when tab hidden
-  ===================================================== */
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) video.pause();
-  });
-
-  /* =====================================================
-     INIT
-  ===================================================== */
   loadData();
-
 })();
 </script>
 </body>
