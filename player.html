@@ -44,10 +44,10 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      pointer-events: none; /* gestures handled by overlay */
+      pointer-events: none;
       background: black;
     }
-    /* gesture overlay – divided into left/right for skip, center for optional future use */
+    /* gesture overlay – divided into left/right for double-tap */
     .gesture-overlay {
       position: absolute;
       inset: 0;
@@ -71,6 +71,7 @@
       background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
       z-index: 20;
       pointer-events: none;
+      transition: opacity 0.2s;
     }
     .top-bar * {
       pointer-events: auto;
@@ -101,8 +102,29 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      flex: 1;
     }
-    /* bottom bar with seek and info */
+    /* playlist button – top right */
+    .playlist-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(34,34,34,0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,215,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #FFD700;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .playlist-btn:active {
+      background: #FFD700;
+      color: black;
+    }
+    /* bottom bar */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -112,6 +134,7 @@
       background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
       z-index: 20;
       pointer-events: none;
+      transition: opacity 0.2s;
     }
     .bottom-bar * {
       pointer-events: auto;
@@ -166,8 +189,7 @@
       opacity: 0;
       transition: opacity 0.1s;
     }
-    .progress-container:active .progress-handle,
-    .progress-container:hover .progress-handle {
+    .progress-container:active .progress-handle {
       opacity: 1;
     }
     .time-indicator {
@@ -177,31 +199,6 @@
       color: #ddd;
       margin-top: 4px;
     }
-    /* side playlist button */
-    .playlist-btn {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 48px;
-      height: 48px;
-      border-radius: 30px;
-      background: rgba(20,20,20,0.8);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,215,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: #FFD700;
-      z-index: 25;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .playlist-btn:active {
-      background: #FFD700;
-      color: black;
-    }
     /* playlist drawer */
     .playlist-drawer {
       position: absolute;
@@ -209,7 +206,7 @@
       top: 0;
       bottom: 0;
       width: 220px;
-      background: rgba(10,10,10,0.95);
+      background: rgba(10,10,10,0.98);
       backdrop-filter: blur(12px);
       border-left: 1px solid #333;
       z-index: 30;
@@ -304,7 +301,7 @@
     .next-btn:active {
       color: #FFD700;
     }
-    /* center play/pause flash */
+    /* center icon (play/pause/skip) */
     .center-icon {
       position: absolute;
       top: 50%;
@@ -364,7 +361,7 @@
       white-space: nowrap;
     }
     #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
-    /* hidden class */
+    /* hidden */
     .hidden { display: none; }
   </style>
 </head>
@@ -379,10 +376,11 @@
         <div class="gesture-right" id="gesture-right"></div>
       </div>
 
-      <!-- Top bar -->
+      <!-- Top bar with playlist button -->
       <div class="top-bar">
         <button class="back-btn" id="back-btn"><i class="fas fa-arrow-left"></i></button>
         <div class="show-title" id="show-title">...</div>
+        <div class="playlist-btn" id="playlist-toggle"><i class="fas fa-list-ul"></i></div>
       </div>
 
       <!-- Bottom bar -->
@@ -404,13 +402,8 @@
         </div>
       </div>
 
-      <!-- Side playlist button -->
-      <div class="playlist-btn" id="playlist-toggle"><i class="fas fa-list-ul"></i></div>
-
       <!-- Playlist drawer -->
-      <div class="playlist-drawer" id="playlist-drawer">
-        <!-- items injected via js -->
-      </div>
+      <div class="playlist-drawer" id="playlist-drawer"></div>
 
       <!-- Next episode overlay -->
       <div class="next-overlay" id="nextOverlay">
@@ -450,16 +443,74 @@
       document.addEventListener('touchstart', e => { if (e.target.tagName === 'VIDEO') e.preventDefault(); }, { passive: false });
       document.addEventListener('enterpictureinpicture', e => e.preventDefault(), true);
 
+      // ---------- URL SHORTENER & SESSION EXPIRE ----------
+      // We'll use localStorage to store mappings from short code to {sid, ei, expiry}
+      const SESSION_DURATION = 60 * 60 * 1000; // 1 hour
+      const CODE_LENGTH = 20; // characters
+
+      function generateShortCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < CODE_LENGTH; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      }
+
+      // Check if current URL has a 'code' parameter
+      const urlParams = new URLSearchParams(location.search);
+      let code = urlParams.get('code');
+      let sid, ei;
+
+      if (code) {
+        // Retrieve mapping from localStorage
+        const mapping = JSON.parse(localStorage.getItem('btftv_codes') || '{}');
+        const data = mapping[code];
+        if (data && data.expiry > Date.now()) {
+          sid = data.sid;
+          ei = data.ei;
+        } else {
+          // Expired or not found
+          toastMsg('सेशन समाप्त हो गया है। कृपया फिर से शुरू करें।');
+          setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+          return;
+        }
+      } else {
+        // No code, expect sid and ei
+        sid = urlParams.get('sid');
+        ei = parseInt(urlParams.get('ei') || '0', 10);
+        if (!sid) {
+          toastMsg('कोई शो नहीं मिला');
+          setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+          return;
+        }
+        // Generate short code and store mapping
+        const shortCode = generateShortCode();
+        const mapping = JSON.parse(localStorage.getItem('btftv_codes') || '{}');
+        mapping[shortCode] = {
+          sid: sid,
+          ei: ei,
+          expiry: Date.now() + SESSION_DURATION
+        };
+        localStorage.setItem('btftv_codes', JSON.stringify(mapping));
+        // Redirect to short URL
+        window.location.replace(location.pathname + '?code=' + shortCode);
+        return; // stop further execution
+      }
+
       // ---------- GLOBALS ----------
       let D = null;
       let show = null;
-      let currentEpIndex = 0;
+      let currentEpIndex = ei || 0;
       let autoNextTimer = null;
       let hideControlsTimer = null;
       let isDraggingProgress = false;
       let touchStartY = 0;
       let touchStartX = 0;
+      let touchStartTime = 0;
+      let lastTapTime = 0;
       const SWIPE_THRESHOLD = 50;
+      const DOUBLE_TAP_DELAY = 300; // ms
 
       const video = document.getElementById('video');
       const progressFill = document.getElementById('progress-fill');
@@ -475,12 +526,11 @@
       const centerIcon = document.getElementById('centerIcon');
       const toast = document.getElementById('toast');
 
-      const params = new URLSearchParams(location.search);
-      const sid = params.get('sid');
-      const ei = parseInt(params.get('ei') || '0', 10);
-      currentEpIndex = ei;
-
       let historyData = JSON.parse(localStorage.getItem('btftv_h') || '{}');
+
+      // Cache name for videos
+      const CACHE_NAME = 'btftv-videos-v1';
+      const CACHE_EXPIRY = 60 * 60 * 1000; // 1 hour
 
       // ---------- UTILS ----------
       function fmtTime(seconds) {
@@ -494,6 +544,76 @@
         toast.textContent = msg;
         toast.classList.add('on');
         setTimeout(() => toast.classList.remove('on'), 2500);
+      }
+
+      // ---------- CACHE VIDEO ----------
+      async function getCachedVideo(url) {
+        const cache = await caches.open(CACHE_NAME);
+        const response = await cache.match(url);
+        if (!response) return null;
+        // Check if expired (using custom header)
+        const cachedTime = response.headers.get('x-cached-time');
+        if (cachedTime && (Date.now() - parseInt(cachedTime, 10)) < CACHE_EXPIRY) {
+          return response;
+        }
+        // Expired, delete from cache
+        await cache.delete(url);
+        return null;
+      }
+
+      async function cacheVideo(url, blob) {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          // Create a new response with blob and custom header
+          const headers = new Headers({
+            'Content-Type': 'video/mp4',
+            'x-cached-time': Date.now().toString()
+          });
+          const response = new Response(blob, { headers });
+          await cache.put(url, response);
+        } catch (e) {
+          console.warn('Cache put failed', e);
+        }
+      }
+
+      async function loadVideo(url) {
+        spinner.classList.add('show');
+        video.src = '';
+        if (window.blobUrl) {
+          URL.revokeObjectURL(window.blobUrl);
+          window.blobUrl = null;
+        }
+        try {
+          // Try to get from cache first
+          let cachedResponse = await getCachedVideo(url);
+          if (cachedResponse) {
+            const blob = await cachedResponse.blob();
+            window.blobUrl = URL.createObjectURL(blob);
+            video.src = window.blobUrl;
+            video.load();
+            video.play().catch(() => {});
+            spinner.classList.remove('show');
+            return;
+          }
+
+          // Not cached, fetch and cache
+          const resp = await fetch(url, { mode: 'cors' });
+          if (!resp.ok) throw new Error();
+          const blob = await resp.blob();
+          // Cache the blob
+          await cacheVideo(url, blob);
+          window.blobUrl = URL.createObjectURL(blob);
+          video.src = window.blobUrl;
+          video.load();
+          video.play().catch(() => {});
+        } catch (e) {
+          toastMsg('वीडियो लोड नहीं हुआ, डायरेक्ट लिंक कोशिश');
+          video.src = url; // fallback
+          video.load();
+          video.play().catch(() => {});
+        } finally {
+          spinner.classList.remove('show');
+        }
       }
 
       // ---------- LOAD DATA ----------
@@ -523,20 +643,16 @@
         loadEpisode(currentEpIndex);
       }
 
-      // ---------- LOAD EPISODE ----------
       function loadEpisode(index) {
         const ep = show.episodes[index];
         if (!ep) return;
-
-        // update url
-        history.replaceState(null, '', location.pathname + '?sid=' + sid + '&ei=' + index);
 
         // update info
         document.getElementById('ep-title').textContent = ep.title || `एपिसोड ${ep.ep}`;
         document.getElementById('ep-meta').innerHTML = `Ep ${ep.ep} · ${ep.duration} · ${show.language}`;
         document.title = `Ep ${ep.ep} – ${show.title} | BTF TV`;
 
-        // load video securely
+        // load video with cache
         loadVideo(ep.video_url);
 
         // update playlist active
@@ -558,37 +674,6 @@
 
         // hide next overlay
         hideNextOverlay();
-      }
-
-      async function loadVideo(url) {
-        spinner.classList.add('show');
-        video.src = '';
-        if (window.blobUrl) {
-          URL.revokeObjectURL(window.blobUrl);
-          window.blobUrl = null;
-        }
-        try {
-          const resp = await fetch(url, { mode: 'cors' });
-          if (!resp.ok) throw new Error();
-          const blob = await resp.blob();
-          window.blobUrl = URL.createObjectURL(blob);
-          video.src = window.blobUrl;
-          video.load();
-          // attempt autoplay
-          video.play().catch(() => {
-            // autoplay blocked – show play icon
-            centerIcon.innerHTML = '<i class="fas fa-play"></i>';
-            centerIcon.classList.add('visible');
-            setTimeout(() => centerIcon.classList.remove('visible'), 1000);
-          });
-        } catch {
-          toastMsg('डायरेक्ट लिंक尝试');
-          video.src = url;  // fallback
-          video.load();
-          video.play().catch(() => {});
-        } finally {
-          spinner.classList.remove('show');
-        }
       }
 
       // ---------- PLAYLIST DRAWER ----------
@@ -629,15 +714,14 @@
         playlistDrawer.classList.toggle('open');
       });
 
-      // close drawer if tap outside (simple: tap on video wrapper)
+      // close drawer if tap outside
       document.querySelector('.video-wrapper').addEventListener('click', (e) => {
         if (playlistDrawer.classList.contains('open') && !e.target.closest('.playlist-drawer') && !e.target.closest('.playlist-btn')) {
           playlistDrawer.classList.remove('open');
         }
       });
 
-      // ---------- GESTURES: VERTICAL SWIPE & TAP SKIP ----------
-      let touchStartTime = 0;
+      // ---------- GESTURES: DOUBLE TAP, SINGLE TAP, VERTICAL SWIPE ----------
       document.querySelector('.video-wrapper').addEventListener('touchstart', (e) => {
         const touch = e.touches[0];
         touchStartY = touch.clientY;
@@ -650,28 +734,37 @@
         const deltaY = touch.clientY - touchStartY;
         const deltaX = touch.clientX - touchStartX;
         const timeDiff = Date.now() - touchStartTime;
+        const now = Date.now();
 
-        // if quick tap (no much movement)
-        if (Math.abs(deltaY) < 20 && Math.abs(deltaX) < 20 && timeDiff < 300) {
-          // tap – determine left/right half for skip
+        // Double tap detection (within 300ms)
+        if (now - lastTapTime < DOUBLE_TAP_DELAY && Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30) {
+          // Double tap – skip based on side
           const half = window.innerWidth / 2;
           if (touch.clientX < half) {
-            // left half: -10s
             skip(-10);
             showCenterIcon('backward');
           } else {
-            // right half: +10s
             skip(10);
             showCenterIcon('forward');
           }
-        } else if (Math.abs(deltaY) > SWIPE_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX)) {
+          lastTapTime = 0; // reset to avoid triple tap
+          return;
+        }
+
+        // Check if it's a swipe (significant movement)
+        if (Math.abs(deltaY) > SWIPE_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX)) {
           // vertical swipe
           if (deltaY < 0) { // swipe up -> next episode
             changeEpisode(1);
           } else { // swipe down -> previous episode
             changeEpisode(-1);
           }
+        } else if (Math.abs(deltaX) < 20 && Math.abs(deltaY) < 20 && timeDiff < 300) {
+          // Single tap (no movement) – toggle play/pause and show/hide controls
+          togglePlayPause();
         }
+
+        lastTapTime = now;
       }, { passive: true });
 
       function skip(seconds) {
@@ -693,6 +786,26 @@
         hideNextOverlay();
         currentEpIndex = newIndex;
         loadEpisode(currentEpIndex);
+      }
+
+      function togglePlayPause() {
+        if (video.paused) {
+          video.play().catch(() => {});
+          showCenterIcon('play');
+        } else {
+          video.pause();
+          showCenterIcon('pause');
+        }
+        // Also toggle controls visibility
+        const topBar = document.querySelector('.top-bar');
+        const bottomBar = document.querySelector('.bottom-bar');
+        if (topBar.style.opacity === '0') {
+          topBar.style.opacity = '1';
+          bottomBar.style.opacity = '1';
+        } else {
+          topBar.style.opacity = '0';
+          bottomBar.style.opacity = '0';
+        }
       }
 
       function showCenterIcon(action) {
@@ -736,7 +849,6 @@
         if (setVideo && video.duration) {
           video.currentTime = pos * video.duration;
         } else {
-          // update time indicator while dragging
           if (video.duration) {
             currentTimeSpan.textContent = fmtTime(pos * video.duration);
           }
@@ -798,7 +910,6 @@
         }
       });
 
-      // next overlay buttons
       document.getElementById('next-cancel').addEventListener('click', () => {
         hideNextOverlay();
         if (autoNextTimer) clearTimeout(autoNextTimer);
@@ -826,22 +937,6 @@
       document.getElementById('back-btn').addEventListener('click', () => {
         if (window.blobUrl) URL.revokeObjectURL(window.blobUrl);
         history.back();
-      });
-
-      // show/hide controls on single tap (already handled by gesture, but we want toggle)
-      // we'll add a click on video-wrapper that toggles bars
-      document.querySelector('.video-wrapper').addEventListener('click', (e) => {
-        // ignore if clicking on playlist or drawer
-        if (e.target.closest('.playlist-drawer') || e.target.closest('.playlist-btn') || e.target.closest('.next-btn')) return;
-        const topBar = document.querySelector('.top-bar');
-        const bottomBar = document.querySelector('.bottom-bar');
-        if (topBar.style.opacity === '0') {
-          topBar.style.opacity = '1';
-          bottomBar.style.opacity = '1';
-        } else {
-          topBar.style.opacity = '0';
-          bottomBar.style.opacity = '0';
-        }
       });
 
       // start
