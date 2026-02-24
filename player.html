@@ -2,17 +2,17 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-  <title>BTF TV – Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BTF TV – Reels Player</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 (free) -->
+  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
@@ -20,49 +20,45 @@
     }
     body {
       font-family: 'Poppins', sans-serif;
-      background: #000;
-      color: #fff;
-      overflow: hidden;
+      background: black;
       height: 100vh;
       width: 100vw;
+      overflow: hidden;
       position: fixed;
       inset: 0;
+      color: white;
     }
-    /* main container – full screen */
     #player {
       position: relative;
       width: 100%;
       height: 100%;
-      background: #000;
-      display: flex;
-      flex-direction: column;
+      background: black;
     }
-    /* video wrapper takes all available space */
     .video-wrapper {
-      flex: 1;
       position: relative;
-      background: #000;
-      overflow: hidden;
-      touch-action: pan-y pinch-zoom; /* allow vertical swipe if needed, but we'll use taps */
+      width: 100%;
+      height: 100%;
+      background: black;
     }
     video {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      pointer-events: none; /* blocks native controls, we handle gestures via overlay */
+      pointer-events: none; /* gestures handled by overlay */
+      background: black;
     }
-    /* transparent overlay for gestures */
+    /* gesture overlay – divided into left/right for skip, center for optional future use */
     .gesture-overlay {
       position: absolute;
       inset: 0;
       display: flex;
-      z-index: 10;
+      z-index: 15;
     }
     .gesture-left, .gesture-right {
       flex: 1;
       height: 100%;
     }
-    /* top bar (back, title, etc) */
+    /* top bar */
     .top-bar {
       position: absolute;
       top: 0;
@@ -72,9 +68,9 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
       z-index: 20;
-      pointer-events: none; /* allow clicks to pass through except back button */
+      pointer-events: none;
     }
     .top-bar * {
       pointer-events: auto;
@@ -83,7 +79,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.15);
+      background: rgba(34,34,34,0.8);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,255,255,0.2);
       display: flex;
@@ -92,7 +88,6 @@
       font-size: 1.3rem;
       color: white;
       cursor: pointer;
-      flex-shrink: 0;
     }
     .back-btn:active {
       background: #FFD700;
@@ -101,100 +96,161 @@
     .show-title {
       font-family: 'Bebas Neue', cursive;
       font-size: 1.4rem;
-      letter-spacing: 1px;
       color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 4px black;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    /* bottom info & episode strip */
-    .bottom-panel {
+    /* bottom bar with seek and info */
+    .bottom-bar {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       padding: 20px 16px 30px;
-      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
       z-index: 20;
       pointer-events: none;
     }
-    .bottom-panel * {
+    .bottom-bar * {
       pointer-events: auto;
     }
     .episode-info {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .episode-title {
       font-family: 'Bebas Neue', cursive;
-      font-size: 2rem;
-      line-height: 1.2;
+      font-size: 1.8rem;
       color: #FFD700;
+      line-height: 1.2;
     }
     .episode-meta {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #ccc;
       display: flex;
       gap: 8px;
+    }
+    /* progress bar */
+    .progress-container {
+      width: 100%;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+    .progress-track {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #FFD700;
+      border-radius: 4px;
+      width: 0%;
+      pointer-events: none;
+    }
+    .progress-handle {
+      width: 16px;
+      height: 16px;
+      background: #FFD700;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      left: 0%;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+    .progress-container:active .progress-handle,
+    .progress-container:hover .progress-handle {
+      opacity: 1;
+    }
+    .time-indicator {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: #ddd;
       margin-top: 4px;
     }
-    .episode-desc {
-      font-size: 0.85rem;
-      color: #ddd;
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-top: 6px;
-      max-width: 90%;
-    }
-    /* episode strip (horizontal scroll) */
-    .ep-strip {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding: 8px 0 4px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .ep-strip::-webkit-scrollbar {
-      display: none;
-    }
-    .ep-pill {
-      min-width: 44px;
-      height: 44px;
+    /* side playlist button */
+    .playlist-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
       border-radius: 30px;
-      background: rgba(34,34,34,0.8);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(20,20,20,0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,215,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      font-size: 1rem;
-      color: white;
-      transition: all 0.15s;
-      padding: 0 16px;
+      font-size: 1.5rem;
+      color: #FFD700;
+      z-index: 25;
       cursor: pointer;
-      flex-shrink: 0;
+      transition: 0.2s;
     }
-    .ep-pill.active {
+    .playlist-btn:active {
       background: #FFD700;
-      color: #000;
-      border-color: #FFD700;
+      color: black;
     }
-    .ep-pill.locked {
-      opacity: 0.6;
-      background: rgba(0,0,0,0.5);
-      color: #aaa;
+    /* playlist drawer */
+    .playlist-drawer {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 220px;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(12px);
+      border-left: 1px solid #333;
+      z-index: 30;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      padding: 20px 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
-    .ep-pill.locked::after {
-      content: '\f023';  /* lock icon */
+    .playlist-drawer.open {
+      transform: translateX(0);
+    }
+    .drawer-item {
+      padding: 14px 20px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      color: white;
+      font-weight: 500;
+    }
+    .drawer-item.active {
+      background: #FFD70020;
+      border-left: 4px solid #FFD700;
+    }
+    .drawer-item.locked {
+      color: #777;
+    }
+    .drawer-item.locked::after {
+      content: '\f023';
       font-family: 'Font Awesome 6 Free';
       font-weight: 900;
-      margin-left: 6px;
-      font-size: 0.8rem;
+      margin-left: auto;
+      font-size: 0.9rem;
+      color: #FFD700;
+    }
+    .drawer-item i {
+      width: 24px;
+      color: #FFD700;
     }
     /* next episode overlay */
     .next-overlay {
@@ -210,7 +266,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 30;
+      z-index: 35;
       transform: translateY(100px);
       opacity: 0;
       transition: all 0.3s ease;
@@ -229,7 +285,6 @@
       font-size: 0.7rem;
       color: #FFD700;
       text-transform: uppercase;
-      letter-spacing: 1px;
     }
     .next-title {
       font-weight: 600;
@@ -245,13 +300,12 @@
       color: white;
       font-size: 1.3rem;
       cursor: pointer;
-      padding: 8px;
     }
     .next-btn:active {
       color: #FFD700;
     }
-    /* center play/pause (shows briefly) */
-    .center-play {
+    /* center play/pause flash */
+    .center-icon {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -264,13 +318,13 @@
       align-items: center;
       justify-content: center;
       font-size: 2rem;
-      color: #000;
-      z-index: 15;
+      color: black;
+      z-index: 40;
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
     }
-    .center-play.visible {
+    .center-icon.visible {
       opacity: 1;
     }
     /* loading spinner */
@@ -285,7 +339,7 @@
       border-top-color: #FFD700;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      z-index: 25;
+      z-index: 50;
       display: none;
     }
     @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
@@ -310,46 +364,70 @@
       white-space: nowrap;
     }
     #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+    /* hidden class */
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div id="player">
     <div class="video-wrapper">
-      <video id="video" playsinline preload="metadata" disablepictureinpicture></video>
-      <!-- gesture overlay -->
+      <video id="video" playsinline preload="auto" disablepictureinpicture></video>
+      
+      <!-- Gesture overlay -->
       <div class="gesture-overlay">
-        <div class="gesture-left" id="tap-left"></div>
-        <div class="gesture-right" id="tap-right"></div>
+        <div class="gesture-left" id="gesture-left"></div>
+        <div class="gesture-right" id="gesture-right"></div>
       </div>
-      <!-- top bar -->
+
+      <!-- Top bar -->
       <div class="top-bar">
         <button class="back-btn" id="back-btn"><i class="fas fa-arrow-left"></i></button>
-        <div class="show-title" id="show-title">Loading...</div>
+        <div class="show-title" id="show-title">...</div>
       </div>
-      <!-- bottom panel -->
-      <div class="bottom-panel">
+
+      <!-- Bottom bar -->
+      <div class="bottom-bar">
         <div class="episode-info">
           <div class="episode-title" id="ep-title"></div>
           <div class="episode-meta" id="ep-meta"></div>
-          <div class="episode-desc" id="ep-desc"></div>
         </div>
-        <!-- horizontal episode strip -->
-        <div class="ep-strip" id="ep-strip"></div>
+        <!-- Progress bar -->
+        <div class="progress-container" id="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+            <div class="progress-handle" id="progress-handle"></div>
+          </div>
+        </div>
+        <div class="time-indicator">
+          <span id="current-time">0:00</span>
+          <span id="duration">--:--</span>
+        </div>
       </div>
-      <!-- next episode overlay -->
+
+      <!-- Side playlist button -->
+      <div class="playlist-btn" id="playlist-toggle"><i class="fas fa-list-ul"></i></div>
+
+      <!-- Playlist drawer -->
+      <div class="playlist-drawer" id="playlist-drawer">
+        <!-- items injected via js -->
+      </div>
+
+      <!-- Next episode overlay -->
       <div class="next-overlay" id="nextOverlay">
         <div class="next-info">
           <span class="next-label">अगला एपिसोड</span>
-          <span class="next-title" id="next-title">Ep 2: Title</span>
+          <span class="next-title" id="next-title"></span>
         </div>
         <div class="next-actions">
           <button class="next-btn" id="next-cancel"><i class="fas fa-times"></i></button>
           <button class="next-btn" id="next-go"><i class="fas fa-step-forward"></i></button>
         </div>
       </div>
-      <!-- center play/pause indicator -->
-      <div class="center-play" id="centerPlay"><i class="fas fa-play"></i></div>
-      <!-- spinner -->
+
+      <!-- Center icon (play/pause/skip) -->
+      <div class="center-icon" id="centerIcon"><i class="fas fa-play"></i></div>
+
+      <!-- Spinner -->
       <div id="spinner"></div>
     </div>
   </div>
@@ -363,40 +441,45 @@
       document.addEventListener('contextmenu', e => e.preventDefault(), true);
       document.addEventListener('keydown', e => {
         const k = e.key.toLowerCase();
-        if ((e.ctrlKey || e.metaKey) && ['s','u','a','c','j','i','p'].includes(k)) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
+        if ((e.ctrlKey || e.metaKey) && ['s','u','a','c','j','i','p'].includes(k)) e.preventDefault();
         if (e.key === 'F12' || e.key === 'PrintScreen') e.preventDefault();
       }, true);
       document.addEventListener('dragstart', e => e.preventDefault(), true);
       document.addEventListener('drop', e => e.preventDefault(), true);
       document.addEventListener('selectstart', e => e.preventDefault(), true);
-      document.addEventListener('touchstart', e => {
-        if (e.target.tagName === 'VIDEO') e.preventDefault();
-      }, { passive: false });
+      document.addEventListener('touchstart', e => { if (e.target.tagName === 'VIDEO') e.preventDefault(); }, { passive: false });
       document.addEventListener('enterpictureinpicture', e => e.preventDefault(), true);
 
       // ---------- GLOBALS ----------
-      let D = null;                // full data
-      let show = null;             // current show
-      let currentEpIndex = 0;      // 0-based
+      let D = null;
+      let show = null;
+      let currentEpIndex = 0;
       let autoNextTimer = null;
       let hideControlsTimer = null;
+      let isDraggingProgress = false;
+      let touchStartY = 0;
+      let touchStartX = 0;
+      const SWIPE_THRESHOLD = 50;
+
       const video = document.getElementById('video');
-      const epStrip = document.getElementById('ep-strip');
+      const progressFill = document.getElementById('progress-fill');
+      const progressHandle = document.getElementById('progress-handle');
+      const progressContainer = document.getElementById('progress-container');
+      const currentTimeSpan = document.getElementById('current-time');
+      const durationSpan = document.getElementById('duration');
+      const playlistDrawer = document.getElementById('playlist-drawer');
+      const playlistToggle = document.getElementById('playlist-toggle');
       const nextOverlay = document.getElementById('nextOverlay');
       const nextTitle = document.getElementById('next-title');
       const spinner = document.getElementById('spinner');
-      const centerPlay = document.getElementById('centerPlay');
+      const centerIcon = document.getElementById('centerIcon');
       const toast = document.getElementById('toast');
-      
+
       const params = new URLSearchParams(location.search);
       const sid = params.get('sid');
       const ei = parseInt(params.get('ei') || '0', 10);
       currentEpIndex = ei;
 
-      // history object for progress
       let historyData = JSON.parse(localStorage.getItem('btftv_h') || '{}');
 
       // ---------- UTILS ----------
@@ -413,13 +496,13 @@
         setTimeout(() => toast.classList.remove('on'), 2500);
       }
 
-      // ---------- DATA LOAD ----------
+      // ---------- LOAD DATA ----------
       async function loadData() {
         try {
           const res = await fetch('https://storytv.btfcompanystorage.workers.dev/data');
-          if (!res.ok) throw new Error('Network error');
+          if (!res.ok) throw new Error();
           D = await res.json();
-        } catch (e) {
+        } catch {
           toastMsg('डेटा लोड नहीं हुआ');
           return;
         }
@@ -428,7 +511,7 @@
           toastMsg('शो नहीं मिला');
           return;
         }
-        // set favicon
+        // favicon
         if (D.site?.favicon_url) {
           let link = document.querySelector("link[rel='icon']") || document.createElement('link');
           link.rel = 'icon';
@@ -436,35 +519,33 @@
           document.head.appendChild(link);
         }
         document.getElementById('show-title').textContent = show.title || 'Show';
-        renderEpisode(currentEpIndex);
-        renderEpisodeStrip();
+        renderPlaylist();
+        loadEpisode(currentEpIndex);
       }
 
-      // ---------- RENDER EPISODE ----------
-      function renderEpisode(index) {
+      // ---------- LOAD EPISODE ----------
+      function loadEpisode(index) {
         const ep = show.episodes[index];
         if (!ep) return;
 
-        // update url (without reload)
-        const newUrl = location.pathname + '?sid=' + sid + '&ei=' + index;
-        history.replaceState(null, '', newUrl);
+        // update url
+        history.replaceState(null, '', location.pathname + '?sid=' + sid + '&ei=' + index);
 
-        // update top and bottom info
+        // update info
         document.getElementById('ep-title').textContent = ep.title || `एपिसोड ${ep.ep}`;
         document.getElementById('ep-meta').innerHTML = `Ep ${ep.ep} · ${ep.duration} · ${show.language}`;
-        document.getElementById('ep-desc').textContent = ep.description || '';
         document.title = `Ep ${ep.ep} – ${show.title} | BTF TV`;
 
         // load video securely
-        loadVideoSecure(ep.video_url, index);
+        loadVideo(ep.video_url);
 
-        // mark active pill
-        document.querySelectorAll('.ep-pill').forEach((pill, i) => {
-          if (i === index) pill.classList.add('active');
-          else pill.classList.remove('active');
+        // update playlist active
+        document.querySelectorAll('.drawer-item').forEach((item, i) => {
+          if (i === index) item.classList.add('active');
+          else item.classList.remove('active');
         });
 
-        // restore progress if any
+        // restore progress
         const key = sid + '_' + index;
         const saved = historyData[key]?.t || 0;
         if (saved > 3) {
@@ -479,8 +560,7 @@
         hideNextOverlay();
       }
 
-      // secure video loading (blob)
-      async function loadVideoSecure(url, idx) {
+      async function loadVideo(url) {
         spinner.classList.add('show');
         video.src = '';
         if (window.blobUrl) {
@@ -496,13 +576,14 @@
           video.load();
           // attempt autoplay
           video.play().catch(() => {
-            // autoplay may be blocked; show play button briefly
-            centerPlay.classList.add('visible');
-            setTimeout(() => centerPlay.classList.remove('visible'), 1000);
+            // autoplay blocked – show play icon
+            centerIcon.innerHTML = '<i class="fas fa-play"></i>';
+            centerIcon.classList.add('visible');
+            setTimeout(() => centerIcon.classList.remove('visible'), 1000);
           });
-        } catch (e) {
-          toastMsg('वीडियो लोड नहीं हुआ, कोशिश कर रहे हैं...');
-          video.src = url;  // fallback to direct url
+        } catch {
+          toastMsg('डायरेक्ट लिंक尝试');
+          video.src = url;  // fallback
           video.load();
           video.play().catch(() => {});
         } finally {
@@ -510,167 +591,210 @@
         }
       }
 
-      // ---------- EPISODE STRIP ----------
-      function renderEpisodeStrip() {
-        const episodes = show.episodes;
+      // ---------- PLAYLIST DRAWER ----------
+      function renderPlaylist() {
         let html = '';
-        episodes.forEach((ep, i) => {
-          const isFree = ep.is_free === true;
+        show.episodes.forEach((ep, i) => {
           const activeClass = (i === currentEpIndex) ? 'active' : '';
-          const lockClass = isFree ? '' : 'locked';
-          html += `<div class="ep-pill ${activeClass} ${lockClass}" data-index="${i}">${ep.ep}</div>`;
+          const lockClass = ep.is_free ? '' : 'locked';
+          html += `<div class="drawer-item ${activeClass} ${lockClass}" data-index="${i}">
+            <i class="fas fa-play-circle"></i> Ep ${ep.ep}
+          </div>`;
         });
-        epStrip.innerHTML = html;
+        playlistDrawer.innerHTML = html;
 
-        // attach click listeners
-        document.querySelectorAll('.ep-pill').forEach(pill => {
-          pill.addEventListener('click', (e) => {
-            const idx = parseInt(pill.dataset.index, 10);
-            if (idx === currentEpIndex) return;
+        // attach click
+        document.querySelectorAll('.drawer-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            const idx = parseInt(item.dataset.index, 10);
+            if (idx === currentEpIndex) {
+              playlistDrawer.classList.remove('open');
+              return;
+            }
             const ep = show.episodes[idx];
             if (!ep.is_free) {
               toastMsg('🔒 यह एपिसोड GOLD सब्सक्राइबर्स के लिए है');
               return;
             }
-            // cancel any pending auto next
             if (autoNextTimer) clearTimeout(autoNextTimer);
             hideNextOverlay();
             currentEpIndex = idx;
-            renderEpisode(idx);
+            loadEpisode(idx);
+            playlistDrawer.classList.remove('open');
           });
         });
       }
 
-      // ---------- GESTURE HANDLING (tap left/right) ----------
-      document.getElementById('tap-left').addEventListener('click', () => {
-        // previous episode
-        if (currentEpIndex > 0) {
-          const prevEp = show.episodes[currentEpIndex - 1];
-          if (!prevEp.is_free) {
-            toastMsg('🔒 पिछला एपिसोड GOLD है');
-            return;
-          }
-          currentEpIndex--;
-          renderEpisode(currentEpIndex);
-        } else {
-          toastMsg('यह पहला एपिसोड है');
+      playlistToggle.addEventListener('click', () => {
+        playlistDrawer.classList.toggle('open');
+      });
+
+      // close drawer if tap outside (simple: tap on video wrapper)
+      document.querySelector('.video-wrapper').addEventListener('click', (e) => {
+        if (playlistDrawer.classList.contains('open') && !e.target.closest('.playlist-drawer') && !e.target.closest('.playlist-btn')) {
+          playlistDrawer.classList.remove('open');
         }
       });
 
-      document.getElementById('tap-right').addEventListener('click', () => {
-        // next episode
-        if (currentEpIndex < show.episodes.length - 1) {
-          const nextEp = show.episodes[currentEpIndex + 1];
-          if (!nextEp.is_free) {
-            toastMsg('🔒 अगला एपिसोड GOLD है');
-            return;
-          }
-          currentEpIndex++;
-          renderEpisode(currentEpIndex);
-        } else {
-          toastMsg('यह आखिरी एपिसोड है');
-        }
-      });
+      // ---------- GESTURES: VERTICAL SWIPE & TAP SKIP ----------
+      let touchStartTime = 0;
+      document.querySelector('.video-wrapper').addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        touchStartY = touch.clientY;
+        touchStartX = touch.clientX;
+        touchStartTime = Date.now();
+      }, { passive: true });
 
-      // double tap for +/- 10s (optional, but we keep simple)
-      let lastTap = 0;
       document.querySelector('.video-wrapper').addEventListener('touchend', (e) => {
-        const now = Date.now();
-        if (now - lastTap < 300) {
-          // double tap: skip based on side
-          const touch = e.changedTouches[0];
+        const touch = e.changedTouches[0];
+        const deltaY = touch.clientY - touchStartY;
+        const deltaX = touch.clientX - touchStartX;
+        const timeDiff = Date.now() - touchStartTime;
+
+        // if quick tap (no much movement)
+        if (Math.abs(deltaY) < 20 && Math.abs(deltaX) < 20 && timeDiff < 300) {
+          // tap – determine left/right half for skip
           const half = window.innerWidth / 2;
           if (touch.clientX < half) {
-            // skip back 10
-            video.currentTime = Math.max(0, video.currentTime - 10);
-            showFlash('left');
+            // left half: -10s
+            skip(-10);
+            showCenterIcon('backward');
           } else {
-            video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
-            showFlash('right');
+            // right half: +10s
+            skip(10);
+            showCenterIcon('forward');
+          }
+        } else if (Math.abs(deltaY) > SWIPE_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX)) {
+          // vertical swipe
+          if (deltaY < 0) { // swipe up -> next episode
+            changeEpisode(1);
+          } else { // swipe down -> previous episode
+            changeEpisode(-1);
           }
         }
-        lastTap = now;
-      });
+      }, { passive: true });
 
-      function showFlash(side) {
-        // simple visual feedback (can be enhanced)
-        centerPlay.innerHTML = side === 'left' ? '<i class="fas fa-backward"></i>' : '<i class="fas fa-forward"></i>';
-        centerPlay.classList.add('visible');
-        setTimeout(() => centerPlay.classList.remove('visible'), 300);
+      function skip(seconds) {
+        video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + seconds));
       }
 
-      // single tap to show/hide controls (already visible, but we can toggle auto-hide)
-      let controlsVisible = true;
-      document.querySelector('.video-wrapper').addEventListener('click', (e) => {
-        // ignore if clicking on buttons or ep-strip
-        if (e.target.closest('button') || e.target.closest('.ep-pill')) return;
-        // toggle top/bottom bars
-        const topBar = document.querySelector('.top-bar');
-        const bottomPanel = document.querySelector('.bottom-panel');
-        if (controlsVisible) {
-          topBar.style.opacity = '0';
-          bottomPanel.style.opacity = '0';
-        } else {
-          topBar.style.opacity = '1';
-          bottomPanel.style.opacity = '1';
-          // auto hide after 3s
-          if (hideControlsTimer) clearTimeout(hideControlsTimer);
-          hideControlsTimer = setTimeout(() => {
-            if (!video.paused) {
-              topBar.style.opacity = '0';
-              bottomPanel.style.opacity = '0';
-              controlsVisible = false;
-            }
-          }, 3000);
+      function changeEpisode(direction) {
+        const newIndex = currentEpIndex + direction;
+        if (newIndex < 0 || newIndex >= show.episodes.length) {
+          toastMsg(direction > 0 ? 'आखिरी एपिसोड है' : 'पहला एपिसोड है');
+          return;
         }
-        controlsVisible = !controlsVisible;
+        const ep = show.episodes[newIndex];
+        if (!ep.is_free) {
+          toastMsg('🔒 यह एपिसोड GOLD है');
+          return;
+        }
+        if (autoNextTimer) clearTimeout(autoNextTimer);
+        hideNextOverlay();
+        currentEpIndex = newIndex;
+        loadEpisode(currentEpIndex);
+      }
+
+      function showCenterIcon(action) {
+        if (action === 'play') centerIcon.innerHTML = '<i class="fas fa-play"></i>';
+        else if (action === 'pause') centerIcon.innerHTML = '<i class="fas fa-pause"></i>';
+        else if (action === 'backward') centerIcon.innerHTML = '<i class="fas fa-backward"></i> 10';
+        else if (action === 'forward') centerIcon.innerHTML = '<i class="fas fa-forward"></i> 10';
+        centerIcon.classList.add('visible');
+        setTimeout(() => centerIcon.classList.remove('visible'), 500);
+      }
+
+      // ---------- PROGRESS BAR ----------
+      progressContainer.addEventListener('touchstart', (e) => {
+        isDraggingProgress = true;
+        updateProgressFromEvent(e.touches[0]);
+        e.preventDefault();
+      }, { passive: false });
+
+      document.addEventListener('touchmove', (e) => {
+        if (isDraggingProgress) {
+          updateProgressFromEvent(e.touches[0]);
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchend', (e) => {
+        if (isDraggingProgress) {
+          isDraggingProgress = false;
+          if (e.changedTouches[0]) {
+            updateProgressFromEvent(e.changedTouches[0], true); // set video time
+          }
+        }
       });
 
-      // video events
+      function updateProgressFromEvent(touch, setVideo = false) {
+        const rect = progressContainer.getBoundingClientRect();
+        let pos = (touch.clientX - rect.left) / rect.width;
+        pos = Math.max(0, Math.min(1, pos));
+        progressFill.style.width = (pos * 100) + '%';
+        progressHandle.style.left = (pos * 100) + '%';
+        if (setVideo && video.duration) {
+          video.currentTime = pos * video.duration;
+        } else {
+          // update time indicator while dragging
+          if (video.duration) {
+            currentTimeSpan.textContent = fmtTime(pos * video.duration);
+          }
+        }
+      }
+
+      // video timeupdate
+      video.addEventListener('timeupdate', () => {
+        if (!isDraggingProgress && video.duration) {
+          const pct = (video.currentTime / video.duration) * 100;
+          progressFill.style.width = pct + '%';
+          progressHandle.style.left = pct + '%';
+          currentTimeSpan.textContent = fmtTime(video.currentTime);
+        }
+        // save progress
+        const key = sid + '_' + currentEpIndex;
+        historyData[key] = { sid, ei: currentEpIndex, t: Math.round(video.currentTime), d: Math.round(video.duration) };
+        try { localStorage.setItem('btftv_h', JSON.stringify(historyData)); } catch { }
+      });
+
+      video.addEventListener('loadedmetadata', () => {
+        durationSpan.textContent = fmtTime(video.duration);
+      });
+
+      // ---------- VIDEO EVENTS ----------
       video.addEventListener('play', () => {
-        centerPlay.innerHTML = '<i class="fas fa-pause"></i>';
-        centerPlay.classList.add('visible');
-        setTimeout(() => centerPlay.classList.remove('visible'), 600);
-        // hide controls after a while
+        showCenterIcon('pause');
         if (hideControlsTimer) clearTimeout(hideControlsTimer);
         hideControlsTimer = setTimeout(() => {
           document.querySelector('.top-bar').style.opacity = '0';
-          document.querySelector('.bottom-panel').style.opacity = '0';
-          controlsVisible = false;
-        }, 3000);
+          document.querySelector('.bottom-bar').style.opacity = '0';
+        }, 2000);
       });
 
       video.addEventListener('pause', () => {
-        centerPlay.innerHTML = '<i class="fas fa-play"></i>';
-        centerPlay.classList.add('visible');
-        // show controls when paused
+        showCenterIcon('play');
         document.querySelector('.top-bar').style.opacity = '1';
-        document.querySelector('.bottom-panel').style.opacity = '1';
-        controlsVisible = true;
+        document.querySelector('.bottom-bar').style.opacity = '1';
         if (hideControlsTimer) clearTimeout(hideControlsTimer);
       });
 
       video.addEventListener('waiting', () => spinner.classList.add('show'));
       video.addEventListener('canplay', () => spinner.classList.remove('show'));
+
       video.addEventListener('ended', () => {
-        // show next episode overlay if available
         if (currentEpIndex < show.episodes.length - 1) {
           const nextEp = show.episodes[currentEpIndex + 1];
           nextTitle.textContent = `Ep ${nextEp.ep}: ${nextEp.title}`;
           nextOverlay.classList.add('show');
-          // auto-go after 5 seconds
           autoNextTimer = setTimeout(() => {
             if (nextEp.is_free) {
               currentEpIndex++;
-              renderEpisode(currentEpIndex);
+              loadEpisode(currentEpIndex);
             } else {
               toastMsg('🔒 अगला एपिसोड GOLD है');
               hideNextOverlay();
             }
           }, 5000);
-        } else {
-          // no next episode
-          toastMsg('सभी एपिसोड देख लिए गए');
         }
       });
 
@@ -689,7 +813,7 @@
             return;
           }
           currentEpIndex++;
-          renderEpisode(currentEpIndex);
+          loadEpisode(currentEpIndex);
         }
       });
 
@@ -698,26 +822,27 @@
         if (autoNextTimer) clearTimeout(autoNextTimer);
       }
 
-      // progress save
-      video.addEventListener('timeupdate', () => {
-        if (!video.duration) return;
-        const key = sid + '_' + currentEpIndex;
-        historyData[key] = {
-          sid, ei: currentEpIndex,
-          t: Math.round(video.currentTime),
-          d: Math.round(video.duration)
-        };
-        try { localStorage.setItem('btftv_h', JSON.stringify(historyData)); } catch (e) {}
-      });
-
       // back button
       document.getElementById('back-btn').addEventListener('click', () => {
         if (window.blobUrl) URL.revokeObjectURL(window.blobUrl);
         history.back();
       });
 
-      // fullscreen handling (optional: we are already full-viewport, but we can allow native fullscreen)
-      // we'll keep it simple
+      // show/hide controls on single tap (already handled by gesture, but we want toggle)
+      // we'll add a click on video-wrapper that toggles bars
+      document.querySelector('.video-wrapper').addEventListener('click', (e) => {
+        // ignore if clicking on playlist or drawer
+        if (e.target.closest('.playlist-drawer') || e.target.closest('.playlist-btn') || e.target.closest('.next-btn')) return;
+        const topBar = document.querySelector('.top-bar');
+        const bottomBar = document.querySelector('.bottom-bar');
+        if (topBar.style.opacity === '0') {
+          topBar.style.opacity = '1';
+          bottomBar.style.opacity = '1';
+        } else {
+          topBar.style.opacity = '0';
+          bottomBar.style.opacity = '0';
+        }
+      });
 
       // start
       loadData();
